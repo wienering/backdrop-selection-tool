@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { sendSubmissionNotification, sendClientConfirmation } from '@/lib/email'
 
 // GET all submissions
 export async function GET(request: NextRequest) {
@@ -113,6 +114,29 @@ export async function POST(request: NextRequest) {
         }
       }
     })
+
+    // Send email notifications
+    try {
+      // Email the attendant about the new selection
+      await sendSubmissionNotification(
+        attendant.email,
+        clientName,
+        clientEmail,
+        eventDate,
+        backdrop.name
+      )
+
+      // Email the client with confirmation
+      await sendClientConfirmation(
+        clientEmail,
+        clientName,
+        eventDate,
+        backdrop.name
+      )
+    } catch (emailError) {
+      console.error('Error sending emails:', emailError)
+      // Don't fail the submission if email fails
+    }
 
     return NextResponse.json(submission, { status: 201 })
   } catch (error) {
