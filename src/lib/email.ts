@@ -13,19 +13,13 @@ const transporter = nodemailer.createTransport({
 export async function sendMagicLink(email: string, token: string) {
   const magicLink = process.env.NEXT_PUBLIC_BASE_URL + '/api/auth/verify?token=' + token
   
-  console.log('Sending magic link to:', email)
-  console.log('Magic link URL:', magicLink)
-  console.log('NEXT_PUBLIC_BASE_URL:', process.env.NEXT_PUBLIC_BASE_URL)
-  
   const mailOptions = {
     from: process.env.SMTP_FROM,
     to: email,
     subject: 'Your Magic Link to Photo Booth Admin',
-    html: '<p>Click <a href="' + magicLink + '">here</a> to log in.</p><p>Or copy this link: ' + magicLink + '</p>',
+    html: '<p>Click <a href="' + magicLink + '">here</a> to log in to your Photo Booth Admin dashboard.</p>',
   }
   await transporter.sendMail(mailOptions)
-  
-  console.log('Magic link email sent successfully to:', email)
 }
 
 export async function sendSubmissionNotification(
