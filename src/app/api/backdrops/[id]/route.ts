@@ -56,7 +56,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params
-    const { name, description, publicStatus } = await request.json()
+    const { name, description, publicStatus, thumbnailUrl } = await request.json()
 
     if (!name) {
       return NextResponse.json(
@@ -70,7 +70,8 @@ export async function PUT(
       data: {
         name,
         description,
-        publicStatus
+        publicStatus,
+        ...(thumbnailUrl && { thumbnailUrl })
       },
       include: {
         attendant: {
