@@ -424,6 +424,27 @@ export default function ManageBackdrops() {
                       src={backdrop.thumbnailUrl}
                       alt={backdrop.name}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Thumbnail failed to load:', backdrop.thumbnailUrl);
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent) {
+                          parent.innerHTML = `
+                            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                              <div class="text-center text-gray-500">
+                                <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
+                                <p class="text-sm">Thumbnail failed to load</p>
+                              </div>
+                            </div>
+                          `;
+                        }
+                      }}
+                      onLoad={() => {
+                        console.log('Thumbnail loaded successfully:', backdrop.thumbnailUrl);
+                      }}
                     />
                     {/* Debug info */}
                     <div className="absolute top-1 left-1 bg-black bg-opacity-75 text-white text-xs p-1 rounded max-w-xs">
@@ -433,6 +454,31 @@ export default function ManageBackdrops() {
                           {backdrop.thumbnailUrl.substring(0, 50)}...
                         </div>
                       )}
+                      <button
+                        onClick={async () => {
+                          if (backdrop.images.length > 0) {
+                            const firstImage = backdrop.images[0];
+                            try {
+                              const response = await fetch(`/api/backdrops/${backdrop.id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ thumbnailUrl: firstImage.imageUrl })
+                              });
+                              if (response.ok) {
+                                alert('Thumbnail updated!');
+                                fetchData();
+                              } else {
+                                alert('Failed to update thumbnail');
+                              }
+                            } catch (error) {
+                              alert('Error updating thumbnail');
+                            }
+                          }
+                        }}
+                        className="mt-1 bg-blue-500 text-white px-2 py-1 rounded text-xs"
+                      >
+                        Set First Image as Thumbnail
+                      </button>
                     </div>
                   </>
                 ) : (
@@ -481,6 +527,7 @@ export default function ManageBackdrops() {
                             alt="Backdrop image"
                             className="w-full h-16 object-cover rounded"
                             onError={(e) => {
+                              console.error('Secondary image failed to load:', image.imageUrl);
                               const target = e.target as HTMLImageElement;
                               target.style.display = 'none';
                               const parent = target.parentElement;
@@ -491,6 +538,9 @@ export default function ManageBackdrops() {
                                   </div>
                                 `;
                               }
+                            }}
+                            onLoad={() => {
+                              console.log('Secondary image loaded:', image.imageUrl);
                             }}
                           />
                           <button
