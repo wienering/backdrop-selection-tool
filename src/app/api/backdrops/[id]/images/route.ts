@@ -4,9 +4,10 @@ import { prisma } from '@/lib/prisma'
 // POST add image to backdrop
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { imageUrl } = await request.json()
 
     if (!imageUrl) {
@@ -18,7 +19,7 @@ export async function POST(
 
     // Verify backdrop exists
     const backdrop = await prisma.backdrop.findUnique({
-      where: { id: params.id }
+      where: { id }
     })
 
     if (!backdrop) {
@@ -30,7 +31,7 @@ export async function POST(
 
     const backdropImage = await prisma.backdropImage.create({
       data: {
-        backdropId: params.id,
+        backdropId: id,
         imageUrl
       }
     })
@@ -48,7 +49,7 @@ export async function POST(
 // DELETE image from backdrop
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { searchParams } = new URL(request.url)

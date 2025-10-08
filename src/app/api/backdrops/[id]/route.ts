@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma'
 // GET single backdrop
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const backdrop = await prisma.backdrop.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         attendant: {
           select: {
@@ -51,9 +52,10 @@ export async function GET(
 // PUT update backdrop
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { name, description, publicStatus } = await request.json()
 
     if (!name) {
@@ -64,7 +66,7 @@ export async function PUT(
     }
 
     const backdrop = await prisma.backdrop.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name,
         description,
@@ -95,11 +97,12 @@ export async function PUT(
 // DELETE backdrop
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.backdrop.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Backdrop deleted successfully' })

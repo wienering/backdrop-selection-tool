@@ -4,11 +4,12 @@ import { prisma } from '@/lib/prisma'
 // GET single attendant
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const attendant = await prisma.attendant.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         backdrops: {
           include: {
@@ -48,9 +49,10 @@ export async function GET(
 // PUT update attendant
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const { name, email } = await request.json()
 
     if (!name || !email) {
@@ -64,7 +66,7 @@ export async function PUT(
     const existingAttendant = await prisma.attendant.findFirst({
       where: {
         email,
-        id: { not: params.id }
+        id: { not: id }
       }
     })
 
@@ -76,7 +78,7 @@ export async function PUT(
     }
 
     const attendant = await prisma.attendant.update({
-      where: { id: params.id },
+      where: { id },
       data: { name, email }
     })
 
@@ -93,11 +95,12 @@ export async function PUT(
 // DELETE attendant
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     await prisma.attendant.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Attendant deleted successfully' })

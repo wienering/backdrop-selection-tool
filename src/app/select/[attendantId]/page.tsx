@@ -25,7 +25,7 @@ interface Attendant {
   email: string
 }
 
-export default function SelectBackdrop({ params }: { params: { attendantId: string } }) {
+export default function SelectBackdrop({ params }: { params: Promise<{ attendantId: string }> }) {
   const [backdrops, setBackdrops] = useState<Backdrop[]>([])
   const [attendant, setAttendant] = useState<Attendant | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -40,14 +40,18 @@ export default function SelectBackdrop({ params }: { params: { attendantId: stri
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    fetchData()
-  }, [params.attendantId])
+    const loadData = async () => {
+      const { attendantId } = await params
+      fetchData(attendantId)
+    }
+    loadData()
+  }, [params])
 
-  const fetchData = async () => {
+  const fetchData = async (attendantId: string) => {
     try {
       const [backdropsRes, attendantRes] = await Promise.all([
-        fetch(`/api/backdrops?attendantId=${params.attendantId}`),
-        fetch(`/api/attendants/${params.attendantId}`)
+        fetch(`/api/backdrops?attendantId=${attendantId}`),
+        fetch(`/api/attendants/${attendantId}`)
       ])
 
       if (!attendantRes.ok) {
@@ -86,7 +90,7 @@ export default function SelectBackdrop({ params }: { params: { attendantId: stri
         body: JSON.stringify({
           ...formData,
           backdropId: selectedBackdrop?.id,
-          attendantId: params.attendantId
+          attendantId: (await params).attendantId
         })
       })
 
