@@ -38,10 +38,23 @@ export default function ViewSubmissions() {
     try {
       const response = await fetch('/api/submissions')
       const data = await response.json()
-      setSubmissions(data)
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch submissions')
+      }
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setSubmissions(data)
+      } else {
+        console.error('Invalid data format:', data)
+        setSubmissions([])
+        setMessage('Invalid data received from server')
+      }
     } catch (error) {
       console.error('Error fetching submissions:', error)
-      setMessage('Error loading submissions')
+      setMessage(error instanceof Error ? error.message : 'Error loading submissions')
+      setSubmissions([])
     } finally {
       setIsLoading(false)
     }

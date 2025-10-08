@@ -4,6 +4,9 @@ import { prisma } from '@/lib/prisma'
 // GET all attendants
 export async function GET() {
   try {
+    // Test database connection first
+    await prisma.$connect()
+    
     const attendants = await prisma.attendant.findMany({
       include: {
         _count: {
@@ -21,8 +24,17 @@ export async function GET() {
     return NextResponse.json(attendants)
   } catch (error) {
     console.error('Error fetching attendants:', error)
+    
+    // Check if it's a database connection error
+    if (error instanceof Error && error.message.includes('connect')) {
+      return NextResponse.json(
+        { error: 'Database connection failed. Please check your DATABASE_URL environment variable.' },
+        { status: 500 }
+      )
+    }
+    
     return NextResponse.json(
-      { error: 'Failed to fetch attendants' },
+      { error: 'Failed to fetch attendants', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }

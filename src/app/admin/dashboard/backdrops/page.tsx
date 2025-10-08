@@ -67,11 +67,22 @@ export default function ManageBackdrops() {
         attendantsRes.json()
       ])
       
-      setBackdrops(backdropsData)
-      setAttendants(attendantsData)
+      // Check for errors in responses
+      if (!backdropsRes.ok) {
+        throw new Error(backdropsData.error || 'Failed to fetch backdrops')
+      }
+      if (!attendantsRes.ok) {
+        throw new Error(attendantsData.error || 'Failed to fetch attendants')
+      }
+      
+      // Ensure data is arrays
+      setBackdrops(Array.isArray(backdropsData) ? backdropsData : [])
+      setAttendants(Array.isArray(attendantsData) ? attendantsData : [])
     } catch (error) {
       console.error('Error fetching data:', error)
-      setMessage('Error loading data')
+      setMessage(error instanceof Error ? error.message : 'Error loading data')
+      setBackdrops([])
+      setAttendants([])
     } finally {
       setIsLoading(false)
     }

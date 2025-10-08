@@ -32,10 +32,23 @@ export default function ManageAttendants() {
     try {
       const response = await fetch('/api/attendants')
       const data = await response.json()
-      setAttendants(data)
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to fetch attendants')
+      }
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setAttendants(data)
+      } else {
+        console.error('Invalid data format:', data)
+        setAttendants([])
+        setMessage('Invalid data received from server')
+      }
     } catch (error) {
       console.error('Error fetching attendants:', error)
-      setMessage('Error loading attendants')
+      setMessage(error instanceof Error ? error.message : 'Error loading attendants')
+      setAttendants([])
     } finally {
       setIsLoading(false)
     }
