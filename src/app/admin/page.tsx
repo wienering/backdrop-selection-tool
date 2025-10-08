@@ -89,7 +89,7 @@ export default function AdminLogin() {
               href="/"
               className="text-blue-600 hover:text-blue-500 text-sm"
             >
-              â† Back to Home
+              Back to Home
             </a>
           </div>
         </form>
