@@ -417,13 +417,24 @@ export default function ManageBackdrops() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {backdrops.map((backdrop) => (
             <div key={backdrop.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="w-full h-48 bg-gray-100 overflow-hidden">
+              <div className="w-full h-48 bg-gray-100 overflow-hidden relative">
                 {backdrop.thumbnailUrl ? (
-                  <img
-                    src={backdrop.thumbnailUrl}
-                    alt={backdrop.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <>
+                    <img
+                      src={backdrop.thumbnailUrl}
+                      alt={backdrop.name}
+                      className="w-full h-full object-cover"
+                    />
+                    {/* Debug info */}
+                    <div className="absolute top-1 left-1 bg-black bg-opacity-75 text-white text-xs p-1 rounded max-w-xs">
+                      <div>Thumbnail: {backdrop.thumbnailUrl ? 'YES' : 'NO'}</div>
+                      {backdrop.thumbnailUrl && (
+                        <div className="break-all text-xs mt-1">
+                          {backdrop.thumbnailUrl.substring(0, 50)}...
+                        </div>
+                      )}
+                    </div>
+                  </>
                 ) : (
                   <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
                     <div className="text-center text-gray-500">
