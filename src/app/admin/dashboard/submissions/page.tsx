@@ -151,7 +151,7 @@ export default function ViewSubmissions() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by name, email, backdrop, or attendant..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
               />
             </div>
             <div>
@@ -162,7 +162,7 @@ export default function ViewSubmissions() {
                 id="filter"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
               >
                 <option value="all">All Submissions</option>
                 <option value="recent">Last 7 Days</option>
@@ -184,7 +184,7 @@ export default function ViewSubmissions() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Total Submissions</p>
+                <p className="text-sm font-medium text-gray-700">Total Submissions</p>
                 <p className="text-2xl font-semibold text-gray-900">{submissions.length}</p>
               </div>
             </div>
@@ -200,7 +200,7 @@ export default function ViewSubmissions() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">This Week</p>
+                <p className="text-sm font-medium text-gray-700">This Week</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {submissions.filter(s => new Date(s.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}
                 </p>
@@ -218,7 +218,7 @@ export default function ViewSubmissions() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-500">Upcoming Events</p>
+                <p className="text-sm font-medium text-gray-700">Upcoming Events</p>
                 <p className="text-2xl font-semibold text-gray-900">
                   {submissions.filter(s => new Date(s.eventDate) > new Date()).length}
                 </p>
