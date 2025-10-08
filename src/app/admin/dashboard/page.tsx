@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import AdminNav from '@/components/AdminNav'
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -54,6 +55,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#FAFAF8]">
+      <AdminNav />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -65,24 +67,45 @@ export default function AdminDashboard() {
             href="/admin/dashboard/attendants"
             className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Manage Attendants</h3>
-            <p className="text-gray-600">Add, edit, and manage photo booth attendants</p>
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span className="text-2xl">👥</span>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold text-gray-900">Manage Attendants</h3>
+                <p className="text-sm text-gray-500">Add, edit, and manage photo booth attendants</p>
+              </div>
+            </div>
           </Link>
 
           <Link
             href="/admin/dashboard/backdrops"
             className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Manage Backdrops</h3>
-            <p className="text-gray-600">Upload and organize backdrop photos</p>
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <span className="text-2xl">🖼️</span>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold text-gray-900">Manage Backdrops</h3>
+                <p className="text-sm text-gray-500">Upload and organize backdrop photos</p>
+              </div>
+            </div>
           </Link>
 
           <Link
             href="/admin/dashboard/submissions"
             className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
           >
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">View Submissions</h3>
-            <p className="text-gray-600">See client backdrop selections</p>
+            <div className="flex items-center mb-4">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <span className="text-2xl">📋</span>
+              </div>
+              <div className="ml-4">
+                <h3 className="text-lg font-semibold text-gray-900">View Submissions</h3>
+                <p className="text-sm text-gray-500">See client backdrop selections</p>
+              </div>
+            </div>
           </Link>
         </div>
 

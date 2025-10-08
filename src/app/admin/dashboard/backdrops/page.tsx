@@ -1,0 +1,495 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
+import Image from 'next/image'
+import AdminNav from '@/components/AdminNav'
+
+interface Attendant {
+  id: string
+  name: string
+  email: string
+}
+
+interface BackdropImage {
+  id: string
+  imageUrl: string
+  createdAt: string
+}
+
+interface Backdrop {
+  id: string
+  name: string
+  description: string | null
+  thumbnailUrl: string
+  publicStatus: boolean
+  attendantId: string
+  createdAt: string
+  attendant: Attendant
+  images: BackdropImage[]
+  _count: {
+    submissions: number
+  }
+}
+
+export default function ManageBackdrops() {
+  const [backdrops, setBackdrops] = useState<Backdrop[]>([])
+  const [attendants, setAttendants] = useState<Attendant[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [showForm, setShowForm] = useState(false)
+  const [editingBackdrop, setEditingBackdrop] = useState<Backdrop | null>(null)
+  const [formData, setFormData] = useState({ 
+    name: '', 
+    description: '', 
+    attendantId: '', 
+    publicStatus: true 
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [message, setMessage] = useState('')
+  const [uploading, setUploading] = useState(false)
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([])
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  const fetchData = async () => {
+    try {
+      const [backdropsRes, attendantsRes] = await Promise.all([
+        fetch('/api/backdrops'),
+        fetch('/api/attendants')
+      ])
+      
+      const [backdropsData, attendantsData] = await Promise.all([
+        backdropsRes.json(),
+        attendantsRes.json()
+      ])
+      
+      setBackdrops(backdropsData)
+      setAttendants(attendantsData)
+    } catch (error) {
+      console.error('Error fetching data:', error)
+      setMessage('Error loading data')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleFileUpload = async (file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    try {
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await response.json()
+      
+      if (response.ok) {
+        return data.fileUrl
+      } else {
+        throw new Error(data.error || 'Upload failed')
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      throw error
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setMessage('')
+
+    try {
+      let thumbnailUrl = formData.thumbnailUrl || ''
+
+      // Upload thumbnail if provided
+      if (thumbnailFile) {
+        thumbnailUrl = await handleFileUpload(thumbnailFile)
+      }
+
+      const url = editingBackdrop 
+        ? `/api/backdrops/${editingBackdrop.id}`
+        : '/api/backdrops'
+      
+      const method = editingBackdrop ? 'PUT' : 'POST'
+      
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          thumbnailUrl: thumbnailUrl || editingBackdrop?.thumbnailUrl
+        })
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        const backdropId = editingBackdrop ? editingBackdrop.id : data.id
+
+        // Upload additional images if provided
+        if (selectedFiles.length > 0) {
+          for (const file of selectedFiles) {
+            try {
+              const imageUrl = await handleFileUpload(file)
+              await fetch(`/api/backdrops/${backdropId}/images`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ imageUrl })
+              })
+            } catch (error) {
+              console.error('Error uploading image:', error)
+            }
+          }
+        }
+
+        setMessage(editingBackdrop ? 'Backdrop updated successfully!' : 'Backdrop created successfully!')
+        resetForm()
+        fetchData()
+      } else {
+        setMessage(data.error || 'Something went wrong')
+      }
+    } catch (error) {
+      setMessage('Something went wrong. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleEdit = (backdrop: Backdrop) => {
+    setEditingBackdrop(backdrop)
+    setFormData({ 
+      name: backdrop.name, 
+      description: backdrop.description || '', 
+      attendantId: backdrop.attendantId,
+      publicStatus: backdrop.publicStatus
+    })
+    setShowForm(true)
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this backdrop? This will also delete all its images and submissions.')) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/backdrops/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setMessage('Backdrop deleted successfully!')
+        fetchData()
+      } else {
+        const data = await response.json()
+        setMessage(data.error || 'Failed to delete backdrop')
+      }
+    } catch (error) {
+      setMessage('Failed to delete backdrop')
+    }
+  }
+
+  const handleDeleteImage = async (backdropId: string, imageId: string) => {
+    try {
+      const response = await fetch(`/api/backdrops/${backdropId}/images?imageId=${imageId}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        setMessage('Image deleted successfully!')
+        fetchData()
+      } else {
+        const data = await response.json()
+        setMessage(data.error || 'Failed to delete image')
+      }
+    } catch (error) {
+      setMessage('Failed to delete image')
+    }
+  }
+
+  const resetForm = () => {
+    setFormData({ name: '', description: '', attendantId: '', publicStatus: true })
+    setEditingBackdrop(null)
+    setShowForm(false)
+    setSelectedFiles([])
+    setThumbnailFile(null)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading backdrops...</p>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-[#FAFAF8]">
+      <AdminNav />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Manage Backdrops</h1>
+              <p className="mt-2 text-gray-600">Upload and organize backdrop photos</p>
+            </div>
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+            >
+              Add New Backdrop
+            </button>
+          </div>
+        </div>
+
+        {message && (
+          <div className={`mb-6 p-4 rounded-md ${
+            message.includes('successfully') 
+              ? 'bg-green-50 text-green-800 border border-green-200' 
+              : 'bg-red-50 text-red-800 border border-red-200'
+          }`}>
+            {message}
+          </div>
+        )}
+
+        {showForm && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4">
+              {editingBackdrop ? 'Edit Backdrop' : 'Add New Backdrop'}
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    Name *
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="attendantId" className="block text-sm font-medium text-gray-700 mb-2">
+                    Attendant *
+                  </label>
+                  <select
+                    id="attendantId"
+                    value={formData.attendantId}
+                    onChange={(e) => setFormData({ ...formData, attendantId: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                  >
+                    <option value="">Select an attendant</option>
+                    {attendants.map((attendant) => (
+                      <option key={attendant.id} value={attendant.id}>
+                        {attendant.name} ({attendant.email})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                  Description
+                </label>
+                <textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-700 mb-2">
+                  Thumbnail Image {!editingBackdrop && '*'}
+                </label>
+                <input
+                  type="file"
+                  id="thumbnail"
+                  accept="image/*"
+                  onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required={!editingBackdrop}
+                />
+                {editingBackdrop && (
+                  <p className="mt-1 text-sm text-gray-500">
+                    Leave empty to keep current thumbnail
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-2">
+                  Additional Images
+                </label>
+                <input
+                  type="file"
+                  id="images"
+                  accept="image/*"
+                  multiple
+                  onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  Select multiple images to add to this backdrop
+                </p>
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="publicStatus"
+                  checked={formData.publicStatus}
+                  onChange={(e) => setFormData({ ...formData, publicStatus: e.target.checked })}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="publicStatus" className="ml-2 block text-sm text-gray-700">
+                  Make this backdrop public (visible to clients)
+                </label>
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50"
+                >
+                  {isSubmitting ? 'Saving...' : (editingBackdrop ? 'Update' : 'Create')}
+                </button>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {backdrops.map((backdrop) => (
+            <div key={backdrop.id} className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="aspect-w-16 aspect-h-9">
+                <Image
+                  src={backdrop.thumbnailUrl}
+                  alt={backdrop.name}
+                  width={400}
+                  height={225}
+                  className="w-full h-48 object-cover"
+                />
+              </div>
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-semibold text-gray-900">{backdrop.name}</h3>
+                  <span className={`px-2 py-1 text-xs rounded-full ${
+                    backdrop.publicStatus 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {backdrop.publicStatus ? 'Public' : 'Private'}
+                  </span>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">
+                  By {backdrop.attendant.name}
+                </p>
+                {backdrop.description && (
+                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                    {backdrop.description}
+                  </p>
+                )}
+                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+                  <span>{backdrop.images.length} images</span>
+                  <span>{backdrop._count.submissions} selections</span>
+                </div>
+                
+                {backdrop.images.length > 0 && (
+                  <div className="mb-4">
+                    <h4 className="text-sm font-medium text-gray-700 mb-2">Images:</h4>
+                    <div className="grid grid-cols-3 gap-2">
+                      {backdrop.images.map((image) => (
+                        <div key={image.id} className="relative group">
+                          <Image
+                            src={image.imageUrl}
+                            alt="Backdrop image"
+                            width={100}
+                            height={75}
+                            className="w-full h-16 object-cover rounded"
+                          />
+                          <button
+                            onClick={() => handleDeleteImage(backdrop.id, image.id)}
+                            className="absolute inset-0 bg-red-500 bg-opacity-0 group-hover:bg-opacity-75 text-white text-xs flex items-center justify-center transition-all duration-200"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => handleEdit(backdrop)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(backdrop.id)}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {backdrops.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No backdrops found</h3>
+            <p className="text-gray-500 mb-4">Get started by adding your first backdrop.</p>
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+            >
+              Add First Backdrop
+            </button>
+          </div>
+        )}
+
+        <div className="mt-8">
+          <Link
+            href="/admin/dashboard"
+            className="text-blue-600 hover:text-blue-500"
+          >
+            ← Back to Dashboard
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
