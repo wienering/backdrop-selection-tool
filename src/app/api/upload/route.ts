@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { put } from '@vercel/blob'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
@@ -12,29 +13,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
     }
 
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
-    }
-
     // Generate unique filename
     const timestamp = Date.now()
     const filename = `${timestamp}-${file.name}`
-    const filepath = join(uploadsDir, filename)
 
-    await writeFile(filepath, buffer)
+    // Check if we're in production and have blob token
+    if (process.env.NODE_ENV === 'production' && process.env.BLOB_READ_WRITE_TOKEN) {
+      // Upload to Vercel Blob storage
+      const blob = await put(filename, file, {
+        access: 'public',
+      })
 
-    const fileUrl = `/uploads/${filename}`
+      return NextResponse.json({ 
+        success: true, 
+        fileUrl: blob.url,
+        filename: filename
+      })
+    } else {
+      // Fallback to local filesystem for development
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
 
-    return NextResponse.json({ 
-      success: true, 
-      fileUrl,
-      filename 
-    })
+      // Create uploads directory if it doesn't exist
+      const uploadsDir = join(process.cwd(), 'public', 'uploads')
+      if (!existsSync(uploadsDir)) {
+        await mkdir(uploadsDir, { recursive: true })
+      }
+
+      const filepath = join(uploadsDir, filename)
+      await writeFile(filepath, buffer)
+
+      const fileUrl = `/uploads/${filename}`
+
+      return NextResponse.json({ 
+        success: true, 
+        fileUrl,
+        filename 
+      })
+    }
   } catch (error) {
     console.error('Error uploading file:', error)
     return NextResponse.json(
