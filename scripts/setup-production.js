@@ -83,38 +83,105 @@ async function setupDatabase() {
     }
     console.log('✅ Database indexes created/verified')
 
-    // Add foreign key constraints one by one
-    const constraints = [
-      `DO $$ 
-      BEGIN
-        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'backdrops_attendantId_fkey') THEN
-          ALTER TABLE "backdrops" ADD CONSTRAINT "backdrops_attendantId_fkey" FOREIGN KEY ("attendantId") REFERENCES "attendants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-        END IF;
-      END $$;`,
-      `DO $$ 
-      BEGIN
-        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'backdrop_images_backdropId_fkey') THEN
-          ALTER TABLE "backdrop_images" ADD CONSTRAINT "backdrop_images_backdropId_fkey" FOREIGN KEY ("backdropId") REFERENCES "backdrops"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-        END IF;
-      END $$;`,
-      `DO $$ 
-      BEGIN
-        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'submissions_backdropId_fkey') THEN
-          ALTER TABLE "submissions" ADD CONSTRAINT "submissions_backdropId_fkey" FOREIGN KEY ("backdropId") REFERENCES "backdrops"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-        END IF;
-      END $$;`,
-      `DO $$ 
-      BEGIN
-        IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'submissions_attendantId_fkey') THEN
-          ALTER TABLE "submissions" ADD CONSTRAINT "submissions_attendantId_fkey" FOREIGN KEY ("attendantId") REFERENCES "attendants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-        END IF;
-      END $$;`
-    ]
-
-    for (const constraintSQL of constraints) {
-      await prisma.$executeRawUnsafe(constraintSQL)
+    // Check table structure and add foreign key constraints carefully
+    console.log('🔍 Checking table structure...')
+    
+    // Check if columns exist before adding constraints
+    const checkColumnSQL = `
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'backdrops' AND column_name = 'attendantId'
+    `
+    
+    const columnCheck = await prisma.$queryRawUnsafe(checkColumnSQL)
+    console.log('Backdrops table columns check:', columnCheck)
+    
+    // Only add foreign key constraints if the columns exist
+    try {
+      // Check if backdrops table has attendantId column
+      const backdropsColumns = await prisma.$queryRawUnsafe(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'backdrops' AND column_name = 'attendantId'
+      `)
+      
+      if (backdropsColumns.length > 0) {
+        await prisma.$executeRawUnsafe(`
+          DO $$ 
+          BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'backdrops_attendantId_fkey') THEN
+              ALTER TABLE "backdrops" ADD CONSTRAINT "backdrops_attendantId_fkey" FOREIGN KEY ("attendantId") REFERENCES "attendants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+            END IF;
+          END $$;
+        `)
+        console.log('✅ Backdrops foreign key constraint added')
+      } else {
+        console.log('⚠️  Backdrops table missing attendantId column, skipping constraint')
+      }
+    } catch (error) {
+      console.log('⚠️  Could not add backdrops foreign key constraint:', error.message)
     }
-    console.log('✅ Foreign key constraints added/verified')
+
+    try {
+      // Check if backdrop_images table has backdropId column
+      const backdropImagesColumns = await prisma.$queryRawUnsafe(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'backdrop_images' AND column_name = 'backdropId'
+      `)
+      
+      if (backdropImagesColumns.length > 0) {
+        await prisma.$executeRawUnsafe(`
+          DO $$ 
+          BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'backdrop_images_backdropId_fkey') THEN
+              ALTER TABLE "backdrop_images" ADD CONSTRAINT "backdrop_images_backdropId_fkey" FOREIGN KEY ("backdropId") REFERENCES "backdrops"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+            END IF;
+          END $$;
+        `)
+        console.log('✅ Backdrop images foreign key constraint added')
+      } else {
+        console.log('⚠️  Backdrop images table missing backdropId column, skipping constraint')
+      }
+    } catch (error) {
+      console.log('⚠️  Could not add backdrop images foreign key constraint:', error.message)
+    }
+
+    try {
+      // Check if submissions table has required columns
+      const submissionsColumns = await prisma.$queryRawUnsafe(`
+        SELECT column_name 
+        FROM information_schema.columns 
+        WHERE table_name = 'submissions' AND column_name IN ('backdropId', 'attendantId')
+      `)
+      
+      if (submissionsColumns.length >= 2) {
+        await prisma.$executeRawUnsafe(`
+          DO $$ 
+          BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'submissions_backdropId_fkey') THEN
+              ALTER TABLE "submissions" ADD CONSTRAINT "submissions_backdropId_fkey" FOREIGN KEY ("backdropId") REFERENCES "backdrops"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+            END IF;
+          END $$;
+        `)
+        
+        await prisma.$executeRawUnsafe(`
+          DO $$ 
+          BEGIN
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE constraint_name = 'submissions_attendantId_fkey') THEN
+              ALTER TABLE "submissions" ADD CONSTRAINT "submissions_attendantId_fkey" FOREIGN KEY ("attendantId") REFERENCES "attendants"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+            END IF;
+          END $$;
+        `)
+        console.log('✅ Submissions foreign key constraints added')
+      } else {
+        console.log('⚠️  Submissions table missing required columns, skipping constraints')
+      }
+    } catch (error) {
+      console.log('⚠️  Could not add submissions foreign key constraints:', error.message)
+    }
+    
+    console.log('✅ Foreign key constraints processing completed')
 
     // Test the setup by creating a sample attendant
     const attendantCount = await prisma.attendant.count()
