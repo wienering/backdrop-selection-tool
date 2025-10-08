@@ -3,12 +3,19 @@ import { sendMagicLink } from '@/lib/email'
 import { prisma } from '@/lib/prisma'
 import crypto from 'crypto'
 
+const ALLOWED_ADMIN_EMAIL = 'info@photoboothguys.ca'
+
 export async function POST(request: NextRequest) {
   try {
     const { email } = await request.json()
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+    }
+
+    // Check if email is authorized
+    if (email.toLowerCase() !== ALLOWED_ADMIN_EMAIL.toLowerCase()) {
+      return NextResponse.json({ error: 'Unauthorized email address' }, { status: 403 })
     }
 
     // Check if admin user exists
