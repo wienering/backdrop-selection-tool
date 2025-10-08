@@ -42,7 +42,8 @@ export default function ManageBackdrops() {
     name: '', 
     description: '', 
     attendantId: '', 
-    publicStatus: true 
+    publicStatus: true,
+    thumbnailUrl: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
@@ -123,7 +124,7 @@ export default function ManageBackdrops() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          thumbnailUrl: thumbnailUrl || editingBackdrop?.thumbnailUrl
+          thumbnailUrl: thumbnailUrl || editingBackdrop?.thumbnailUrl || ''
         })
       })
 
@@ -167,7 +168,8 @@ export default function ManageBackdrops() {
       name: backdrop.name, 
       description: backdrop.description || '', 
       attendantId: backdrop.attendantId,
-      publicStatus: backdrop.publicStatus
+      publicStatus: backdrop.publicStatus,
+      thumbnailUrl: backdrop.thumbnailUrl
     })
     setShowForm(true)
   }
@@ -213,7 +215,7 @@ export default function ManageBackdrops() {
   }
 
   const resetForm = () => {
-    setFormData({ name: '', description: '', attendantId: '', publicStatus: true })
+    setFormData({ name: '', description: '', attendantId: '', publicStatus: true, thumbnailUrl: '' })
     setEditingBackdrop(null)
     setShowForm(false)
     setSelectedFiles([])
