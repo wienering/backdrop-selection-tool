@@ -51,6 +51,7 @@ export default function ManageBackdrops() {
   const [uploading, setUploading] = useState(false)
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
+  const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
 
   useEffect(() => {
     fetchData()
@@ -244,6 +245,14 @@ export default function ManageBackdrops() {
     setThumbnailFile(null)
   }
 
+  const openImageModal = (imageUrl: string) => {
+    setModalImageUrl(imageUrl)
+  }
+
+  const closeImageModal = () => {
+    setModalImageUrl(null)
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
@@ -423,7 +432,8 @@ export default function ManageBackdrops() {
                     <img
                       src={backdrop.thumbnailUrl}
                       alt={backdrop.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => openImageModal(backdrop.thumbnailUrl)}
                       onError={(e) => {
                         console.error('Thumbnail failed to load:', backdrop.thumbnailUrl);
                         const target = e.target as HTMLImageElement;
@@ -483,7 +493,7 @@ export default function ManageBackdrops() {
                               }
                             } catch (error) {
                               console.error('Error updating thumbnail:', error);
-                              alert(`Error updating thumbnail: ${error.message}`);
+                              alert(`Error updating thumbnail: ${error instanceof Error ? error.message : String(error)}`);
                             }
                           } else {
                             alert('No images available to set as thumbnail');
@@ -535,11 +545,11 @@ export default function ManageBackdrops() {
                     <h4 className="text-sm font-medium text-gray-700 mb-2">Images:</h4>
                     <div className="grid grid-cols-3 gap-2">
                       {backdrop.images.map((image) => (
-                        <div key={image.id} className="relative group">
+                        <div key={image.id} className="relative group cursor-pointer" onClick={() => openImageModal(image.imageUrl)}>
                           <img
                             src={image.imageUrl}
                             alt="Backdrop image"
-                            className="w-full h-16 object-cover rounded"
+                            className="w-full h-16 object-cover rounded hover:opacity-80 transition-opacity"
                             onError={(e) => {
                               console.error('Secondary image failed to load:', image.imageUrl);
                               const target = e.target as HTMLImageElement;
@@ -558,10 +568,13 @@ export default function ManageBackdrops() {
                             }}
                           />
                           <button
-                            onClick={() => handleDeleteImage(backdrop.id, image.id)}
-                            className="absolute inset-0 bg-red-500 bg-opacity-0 group-hover:bg-opacity-75 text-white text-xs flex items-center justify-center transition-all duration-200"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteImage(backdrop.id, image.id);
+                            }}
+                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
                           >
-                            Delete
+                            ×
                           </button>
                         </div>
                       ))}
@@ -616,6 +629,26 @@ export default function ManageBackdrops() {
         </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {modalImageUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={closeImageModal}>
+          <div className="relative max-w-4xl max-h-full p-4">
+            <button
+              onClick={closeImageModal}
+              className="absolute top-4 right-4 text-white text-2xl font-bold hover:text-gray-300 z-10"
+            >
+              ×
+            </button>
+            <img
+              src={modalImageUrl}
+              alt="Full size image"
+              className="max-w-full max-h-full object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </>
   )
 }
