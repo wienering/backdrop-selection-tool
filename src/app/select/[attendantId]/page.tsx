@@ -39,6 +39,9 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
+  const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
+  const [modalImages, setModalImages] = useState<string[]>([])
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
 
   useEffect(() => {
     const loadData = async () => {
@@ -77,6 +80,33 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
   const handleBackdropSelect = (backdrop: Backdrop) => {
     setSelectedBackdrop(backdrop)
     setShowSubmissionForm(true)
+  }
+
+  const openImageModal = (backdrop: Backdrop) => {
+    const allImages = [backdrop.thumbnailUrl, ...backdrop.images.map(img => img.imageUrl)]
+    setModalImages(allImages)
+    setCurrentImageIndex(0)
+    setModalImageUrl(allImages[0])
+  }
+
+  const closeImageModal = () => {
+    setModalImageUrl(null)
+    setModalImages([])
+    setCurrentImageIndex(0)
+  }
+
+  const nextImage = () => {
+    if (currentImageIndex < modalImages.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1)
+      setModalImageUrl(modalImages[currentImageIndex + 1])
+    }
+  }
+
+  const prevImage = () => {
+    if (currentImageIndex > 0) {
+      setCurrentImageIndex(currentImageIndex - 1)
+      setModalImageUrl(modalImages[currentImageIndex - 1])
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -261,15 +291,20 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {backdrops.map((backdrop) => (
             <div key={backdrop.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="aspect-w-16 aspect-h-9">
+              <div className="aspect-w-16 aspect-h-9 relative">
                 <Image
                   src={backdrop.thumbnailUrl}
                   alt={backdrop.name}
                   width={400}
                   height={225}
-                  className="w-full h-48 object-cover cursor-pointer"
-                  onClick={() => handleBackdropSelect(backdrop)}
+                  className="w-full h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={() => openImageModal(backdrop)}
                 />
+                {backdrop.images.length > 0 && (
+                  <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+                    +{backdrop.images.length} more
+                  </div>
+                )}
               </div>
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">{backdrop.name}</h3>
@@ -278,14 +313,24 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                 )}
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-gray-500">
-                    {backdrop.images.length} image{backdrop.images.length !== 1 ? 's' : ''}
+                    {backdrop.images.length + 1} image{(backdrop.images.length + 1) !== 1 ? 's' : ''}
                   </span>
-                  <button
-                    onClick={() => handleBackdropSelect(backdrop)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
-                  >
-                    Select This Backdrop
-                  </button>
+                  <div className="flex space-x-2">
+                    {backdrop.images.length > 0 && (
+                      <button
+                        onClick={() => openImageModal(backdrop)}
+                        className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+                      >
+                        View Images
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleBackdropSelect(backdrop)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                    >
+                      Select This Backdrop
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -314,6 +359,56 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
         </div>
         </div>
       </div>
+
+      {/* Image Modal */}
+      {modalImageUrl && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onClick={closeImageModal}>
+          <div className="relative max-w-4xl max-h-full p-4">
+            <button
+              onClick={closeImageModal}
+              className="absolute top-4 right-4 text-white text-2xl font-bold hover:text-gray-300 z-10"
+            >
+              ×
+            </button>
+            
+            <img
+              src={modalImageUrl}
+              alt="Backdrop image"
+              className="max-w-full max-h-full object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+            
+            {modalImages.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    prevImage()
+                  }}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-2xl font-bold hover:text-gray-300 z-10"
+                  disabled={currentImageIndex === 0}
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    nextImage()
+                  }}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl font-bold hover:text-gray-300 z-10"
+                  disabled={currentImageIndex === modalImages.length - 1}
+                >
+                  ›
+                </button>
+                
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
+                  {currentImageIndex + 1} of {modalImages.length}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </>
   )
 }
