@@ -3,7 +3,7 @@
 const transporter = nodemailer.createTransporter({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+  secure: process.env.SMTP_PORT === '465',
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASSWORD,
@@ -11,13 +11,13 @@ const transporter = nodemailer.createTransporter({
 })
 
 export async function sendMagicLink(email: string, token: string) {
-  const magicLink = ${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/verify?token=
+  const magicLink = process.env.NEXT_PUBLIC_BASE_URL + '/api/auth/verify?token=' + token
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to: email,
     subject: 'Your Magic Link to Photo Booth Admin',
-    html: <p>Click <a href="">here</a> to log in to your Photo Booth Admin dashboard.</p>,
+    html: 'Click <a href="' + magicLink + '">here</a> to log in to your Photo Booth Admin dashboard.',
   })
 }
 
@@ -31,16 +31,8 @@ export async function sendSubmissionNotification(
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to: attendantEmail,
-    subject: New Backdrop Selection from ,
-    html: 
-      <p>A new backdrop selection has been made:</p>
-      <ul>
-        <li>Client Name: </li>
-        <li>Client Email: </li>
-        <li>Event Date: </li>
-        <li>Selected Backdrop: </li>
-      </ul>
-    ,
+    subject: 'New Backdrop Selection from ' + clientName,
+    html: 'A new backdrop selection has been made: Client Name: ' + clientName + ', Client Email: ' + clientEmail + ', Event Date: ' + eventDate + ', Selected Backdrop: ' + backdropName,
   })
 }
 
@@ -53,16 +45,7 @@ export async function sendClientConfirmation(
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to: clientEmail,
-    subject: Your Photo Booth Backdrop Selection Confirmation,
-    html: 
-      <p>Dear ,</p>
-      <p>Thank you for your backdrop selection!</p>
-      <p>Here are the details:</p>
-      <ul>
-        <li>Event Date: </li>
-        <li>Selected Backdrop: </li>
-      </ul>
-      <p>We look forward to your event!</p>
-    ,
+    subject: 'Your Photo Booth Backdrop Selection Confirmation',
+    html: 'Dear ' + clientName + ', Thank you for your backdrop selection! Event Date: ' + eventDate + ', Selected Backdrop: ' + backdropName + '. We look forward to your event!',
   })
 }
