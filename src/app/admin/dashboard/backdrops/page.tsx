@@ -275,13 +275,13 @@ export default function ManageBackdrops() {
 
         {showForm && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
               {editingBackdrop ? 'Edit Backdrop' : 'Add New Backdrop'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">
                     Name *
                   </label>
                   <input
@@ -289,19 +289,20 @@ export default function ManageBackdrops() {
                     id="name"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Enter backdrop name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                     required
                   />
                 </div>
                 <div>
-                  <label htmlFor="attendantId" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="attendantId" className="block text-sm font-medium text-gray-900 mb-2">
                     Attendant *
                   </label>
                   <select
                     id="attendantId"
                     value={formData.attendantId}
                     onChange={(e) => setFormData({ ...formData, attendantId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                     required
                   >
                     <option value="">Select an attendant</option>
@@ -315,7 +316,7 @@ export default function ManageBackdrops() {
               </div>
               
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-900 mb-2">
                   Description
                 </label>
                 <textarea
@@ -323,12 +324,13 @@ export default function ManageBackdrops() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter backdrop description (optional)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
                 />
               </div>
 
               <div>
-                <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-900 mb-2">
                   Thumbnail Image {!editingBackdrop && '*'}
                 </label>
                 <input
@@ -336,18 +338,18 @@ export default function ManageBackdrops() {
                   id="thumbnail"
                   accept="image/*"
                   onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                   required={!editingBackdrop}
                 />
                 {editingBackdrop && (
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 text-sm text-gray-600">
                     Leave empty to keep current thumbnail
                   </p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="images" className="block text-sm font-medium text-gray-900 mb-2">
                   Additional Images
                 </label>
                 <input
@@ -356,9 +358,9 @@ export default function ManageBackdrops() {
                   accept="image/*"
                   multiple
                   onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 />
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-600">
                   Select multiple images to add to this backdrop
                 </p>
               </div>
@@ -371,7 +373,7 @@ export default function ManageBackdrops() {
                   onChange={(e) => setFormData({ ...formData, publicStatus: e.target.checked })}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="publicStatus" className="ml-2 block text-sm text-gray-700">
+                <label htmlFor="publicStatus" className="ml-2 block text-sm text-gray-900">
                   Make this backdrop public (visible to clients)
                 </label>
               </div>
@@ -380,14 +382,14 @@ export default function ManageBackdrops() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50 transition-colors"
                 >
                   {isSubmitting ? 'Saving...' : (editingBackdrop ? 'Update' : 'Create')}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-md font-medium"
+                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md font-medium transition-colors"
                 >
                   Cancel
                 </button>
