@@ -458,21 +458,35 @@ export default function ManageBackdrops() {
                         onClick={async () => {
                           if (backdrop.images.length > 0) {
                             const firstImage = backdrop.images[0];
+                            console.log('Attempting to set thumbnail:', firstImage.imageUrl);
                             try {
                               const response = await fetch(`/api/backdrops/${backdrop.id}`, {
                                 method: 'PUT',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ thumbnailUrl: firstImage.imageUrl })
+                                body: JSON.stringify({ 
+                                  name: backdrop.name,
+                                  description: backdrop.description,
+                                  publicStatus: backdrop.publicStatus,
+                                  thumbnailUrl: firstImage.imageUrl 
+                                })
                               });
+                              
+                              const responseData = await response.json();
+                              console.log('Response status:', response.status);
+                              console.log('Response data:', responseData);
+                              
                               if (response.ok) {
                                 alert('Thumbnail updated!');
                                 fetchData();
                               } else {
-                                alert('Failed to update thumbnail');
+                                alert(`Failed to update thumbnail: ${responseData.error || 'Unknown error'}`);
                               }
                             } catch (error) {
-                              alert('Error updating thumbnail');
+                              console.error('Error updating thumbnail:', error);
+                              alert(`Error updating thumbnail: ${error.message}`);
                             }
+                          } else {
+                            alert('No images available to set as thumbnail');
                           }
                         }}
                         className="mt-1 bg-blue-500 text-white px-2 py-1 rounded text-xs"
