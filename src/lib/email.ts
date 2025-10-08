@@ -1,6 +1,6 @@
 ﻿import nodemailer from 'nodemailer'
 
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT || '587'),
   secure: process.env.SMTP_PORT === '465',
@@ -12,13 +12,13 @@ const transporter = nodemailer.createTransporter({
 
 export async function sendMagicLink(email: string, token: string) {
   const magicLink = process.env.NEXT_PUBLIC_BASE_URL + '/api/auth/verify?token=' + token
-
-  await transporter.sendMail({
+  const mailOptions = {
     from: process.env.SMTP_FROM,
     to: email,
     subject: 'Your Magic Link to Photo Booth Admin',
-    html: 'Click <a href="' + magicLink + '">here</a> to log in to your Photo Booth Admin dashboard.',
-  })
+    html: '<p>Click <a href="' + magicLink + '">here</a> to log in.</p>',
+  }
+  await transporter.sendMail(mailOptions)
 }
 
 export async function sendSubmissionNotification(
@@ -32,7 +32,7 @@ export async function sendSubmissionNotification(
     from: process.env.SMTP_FROM,
     to: attendantEmail,
     subject: 'New Backdrop Selection from ' + clientName,
-    html: 'A new backdrop selection has been made: Client Name: ' + clientName + ', Client Email: ' + clientEmail + ', Event Date: ' + eventDate + ', Selected Backdrop: ' + backdropName,
+    html: 'New selection: ' + clientName + ', ' + clientEmail + ', ' + eventDate + ', ' + backdropName,
   })
 }
 
@@ -45,7 +45,7 @@ export async function sendClientConfirmation(
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to: clientEmail,
-    subject: 'Your Photo Booth Backdrop Selection Confirmation',
-    html: 'Dear ' + clientName + ', Thank you for your backdrop selection! Event Date: ' + eventDate + ', Selected Backdrop: ' + backdropName + '. We look forward to your event!',
+    subject: 'Your Backdrop Selection Confirmation',
+    html: 'Dear ' + clientName + ', Your selection: ' + eventDate + ', ' + backdropName,
   })
 }
