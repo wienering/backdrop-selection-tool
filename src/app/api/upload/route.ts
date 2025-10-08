@@ -17,20 +17,33 @@ export async function POST(request: NextRequest) {
     const timestamp = Date.now()
     const filename = `${timestamp}-${file.name}`
 
-    // Check if we're in production and have blob token
-    if (process.env.NODE_ENV === 'production' && process.env.BLOB_READ_WRITE_TOKEN) {
-      // Upload to Vercel Blob storage
-      const blob = await put(filename, file, {
-        access: 'public',
-      })
+    // Check if we're in production
+    if (process.env.NODE_ENV === 'production') {
+      // In production, always try Vercel Blob first
+      if (process.env.BLOB_READ_WRITE_TOKEN) {
+        try {
+          const blob = await put(filename, file, {
+            access: 'public',
+          })
 
-      return NextResponse.json({ 
-        success: true, 
-        fileUrl: blob.url,
-        filename: filename
-      })
+          return NextResponse.json({ 
+            success: true, 
+            fileUrl: blob.url,
+            filename: filename
+          })
+        } catch (blobError) {
+          console.error('Vercel Blob upload failed:', blobError)
+          // Fall through to error response
+        }
+      }
+      
+      // If we get here, Blob storage isn't available
+      return NextResponse.json(
+        { error: 'File upload not configured. Please set up Vercel Blob storage.' },
+        { status: 500 }
+      )
     } else {
-      // Fallback to local filesystem for development
+      // Development: use local filesystem
       const bytes = await file.arrayBuffer()
       const buffer = Buffer.from(bytes)
 
