@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Head from 'next/head'
 
 export default function Home() {
   const [attendantId, setAttendantId] = useState('')
@@ -14,7 +15,12 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex flex-col">
+    <>
+      <Head>
+        <title>Photo Booth Backdrop Selection Tool</title>
+        <meta name="description" content="Choose your perfect backdrop for your photo booth experience" />
+      </Head>
+      <div className="min-h-screen bg-[#FAFAF8] flex flex-col">
       <main className="flex-grow flex items-center justify-center px-4 py-12">
         <div className="max-w-2xl w-full">
           <div className="text-center mb-12">
@@ -74,6 +80,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
-    </div>
+      </div>
+    </>
   )
 }

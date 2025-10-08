@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import Head from 'next/head'
 import Link from 'next/link'
 
 interface BackdropImage {
@@ -140,8 +141,13 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <Head>
+        <title>Select Your Backdrop - Photo Booth</title>
+        <meta name="description" content="Choose your perfect backdrop for your photo booth experience" />
+      </Head>
+      <div className="min-h-screen bg-[#FAFAF8]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Choose Your Perfect Backdrop
@@ -306,7 +312,8 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
             ← Back to Home
           </Link>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

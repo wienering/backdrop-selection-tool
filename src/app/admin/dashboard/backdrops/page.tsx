@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import AdminNav from '@/components/AdminNav'
+import Head from 'next/head'
 
 interface Attendant {
   id: string
@@ -245,9 +246,14 @@ export default function ManageBackdrops() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8]">
-      <AdminNav />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <>
+      <Head>
+        <title>Manage Backdrops - Photo Booth Backdrop Tool</title>
+        <meta name="description" content="Upload and organize backdrop photos for photo booth" />
+      </Head>
+      <div className="min-h-screen bg-[#FAFAF8]">
+        <AdminNav />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -504,7 +510,8 @@ export default function ManageBackdrops() {
             ← Back to Dashboard
           </Link>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   )
 }

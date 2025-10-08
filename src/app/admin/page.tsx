@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Head from 'next/head'
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('')
@@ -38,7 +39,12 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <>
+      <Head>
+        <title>Admin Login - Photo Booth Backdrop Tool</title>
+        <meta name="description" content="Admin login for photo booth backdrop management" />
+      </Head>
+      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
@@ -94,6 +100,7 @@ export default function AdminLogin() {
           </div>
         </form>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
