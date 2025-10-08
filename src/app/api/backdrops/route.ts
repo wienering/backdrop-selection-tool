@@ -46,9 +46,9 @@ export async function POST(request: NextRequest) {
   try {
     const { name, description, thumbnailUrl, attendantId, publicStatus = true } = await request.json()
 
-    if (!name || !thumbnailUrl || !attendantId) {
+    if (!name || !attendantId) {
       return NextResponse.json(
-        { error: 'Name, thumbnail URL, and attendant ID are required' },
+        { error: 'Name and attendant ID are required' },
         { status: 400 }
       )
     }
@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         description,
-        thumbnailUrl,
+        thumbnailUrl: thumbnailUrl || '',
         attendantId,
         publicStatus
       },
