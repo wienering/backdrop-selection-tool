@@ -1,15 +1,73 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("admin_users")
+}
+
+model Attendant {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  backdrops Backdrop[]
+  submissions Submission[]
+
+  @@map("attendants")
+}
+
+model Backdrop {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  thumbnailUrl  String
+  publicStatus  Boolean  @default(true)
+  attendantId   String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  attendant     Attendant @relation(fields: [attendantId], references: [id], onDelete: Cascade)
+  images        BackdropImage[]
+  submissions   Submission[]
+
+  @@map("backdrops")
+}
+
+model BackdropImage {
+  id         String   @id @default(cuid())
+  backdropId String
+  imageUrl   String
+  createdAt  DateTime @default(now())
+
+  backdrop   Backdrop @relation(fields: [backdropId], references: [id], onDelete: Cascade)
+
+  @@map("backdrop_images")
+}
+
+model Submission {
+  id           String   @id @default(cuid())
+  clientName   String
+  clientEmail  String
+  eventDate    DateTime
+  backdropId   String
+  attendantId  String
+  createdAt    DateTime @default(now())
+
+  backdrop     Backdrop @relation(fields: [backdropId], references: [id], onDelete: Cascade)
+  attendant    Attendant @relation(fields: [attendantId], references: [id], onDelete: Cascade)
+
+  @@map("submissions")
 }
