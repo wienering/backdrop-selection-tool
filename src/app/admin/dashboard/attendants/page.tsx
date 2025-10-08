@@ -24,6 +24,7 @@ export default function ManageAttendants() {
   const [formData, setFormData] = useState({ name: '', email: '' })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
+  const [showCopyModal, setShowCopyModal] = useState(false)
 
   useEffect(() => {
     fetchAttendants()
@@ -276,7 +277,8 @@ export default function ManageAttendants() {
                           onClick={() => {
                             const selectionUrl = `${window.location.origin}/select/${attendant.id}`;
                             navigator.clipboard.writeText(selectionUrl).then(() => {
-                              alert('Selection link copied to clipboard!');
+                              setShowCopyModal(true);
+                              setTimeout(() => setShowCopyModal(false), 2000);
                             }).catch(() => {
                               // Fallback for older browsers
                               const textArea = document.createElement('textarea');
@@ -285,7 +287,8 @@ export default function ManageAttendants() {
                               textArea.select();
                               document.execCommand('copy');
                               document.body.removeChild(textArea);
-                              alert('Selection link copied to clipboard!');
+                              setShowCopyModal(true);
+                              setTimeout(() => setShowCopyModal(false), 2000);
                             });
                           }}
                           className="text-green-600 hover:text-green-900 font-medium"
@@ -329,6 +332,26 @@ export default function ManageAttendants() {
         </div>
         </div>
       </div>
+
+      {/* Copy Success Modal */}
+      {showCopyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-lg">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm font-medium text-gray-900">
+                  Selection link copied to clipboard!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
