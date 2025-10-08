@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       } catch (error) {
         imageTest = {
           url: testUrl,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         }
       }
     }
