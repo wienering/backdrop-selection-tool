@@ -273,6 +273,27 @@ export default function ManageAttendants() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
+                          onClick={() => {
+                            const selectionUrl = `${window.location.origin}/select/${attendant.id}`;
+                            navigator.clipboard.writeText(selectionUrl).then(() => {
+                              alert('Selection link copied to clipboard!');
+                            }).catch(() => {
+                              // Fallback for older browsers
+                              const textArea = document.createElement('textarea');
+                              textArea.value = selectionUrl;
+                              document.body.appendChild(textArea);
+                              textArea.select();
+                              document.execCommand('copy');
+                              document.body.removeChild(textArea);
+                              alert('Selection link copied to clipboard!');
+                            });
+                          }}
+                          className="text-green-600 hover:text-green-900 font-medium"
+                          title="Copy selection link"
+                        >
+                          Copy Link
+                        </button>
+                        <button
                           onClick={() => handleEdit(attendant)}
                           className="text-blue-600 hover:text-blue-900"
                         >
