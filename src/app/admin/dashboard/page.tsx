@@ -10,8 +10,9 @@ export default function AdminDashboard() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const hasCookie = document.cookie.split('; ').some(row => row.startsWith('admin-session='))
-        setIsAuthenticated(hasCookie)
+        const response = await fetch('/api/auth/session')
+        const data = await response.json()
+        setIsAuthenticated(data.authenticated)
       } catch (error) {
         console.error('Auth check error:', error)
         setIsAuthenticated(false)
