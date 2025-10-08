@@ -417,15 +417,42 @@ export default function ManageBackdrops() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {backdrops.map((backdrop) => (
             <div key={backdrop.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="aspect-w-16 aspect-h-9">
+              <div className="w-full h-48 bg-gray-100 relative">
                 {backdrop.thumbnailUrl ? (
-                  <Image
-                    src={backdrop.thumbnailUrl}
-                    alt={backdrop.name}
-                    width={400}
-                    height={225}
-                    className="w-full h-48 object-cover"
-                  />
+                  <>
+                    {/* Test with regular img tag */}
+                    <img
+                      src={backdrop.thumbnailUrl}
+                      alt={backdrop.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Regular img failed to load:', backdrop.thumbnailUrl)
+                        console.error('Error event:', e)
+                      }}
+                      onLoad={() => {
+                        console.log('Regular img loaded successfully:', backdrop.thumbnailUrl)
+                      }}
+                    />
+                    {/* Also try Next.js Image */}
+                    <Image
+                      src={backdrop.thumbnailUrl}
+                      alt={backdrop.name}
+                      width={400}
+                      height={225}
+                      className="w-full h-full object-cover absolute top-0 left-0 opacity-50"
+                      onError={(e) => {
+                        console.error('Next.js Image failed to load:', backdrop.thumbnailUrl)
+                        console.error('Error event:', e)
+                      }}
+                      onLoad={() => {
+                        console.log('Next.js Image loaded successfully:', backdrop.thumbnailUrl)
+                      }}
+                    />
+                    {/* Temporary debug overlay */}
+                    <div className="absolute top-1 left-1 bg-black bg-opacity-50 text-white text-xs p-1 rounded">
+                      {backdrop.thumbnailUrl ? 'Has URL' : 'No URL'}
+                    </div>
+                  </>
                 ) : (
                   <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
                     <div className="text-center text-gray-500">
