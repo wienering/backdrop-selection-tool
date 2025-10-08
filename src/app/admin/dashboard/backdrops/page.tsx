@@ -419,13 +419,26 @@ export default function ManageBackdrops() {
             <div key={backdrop.id} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="aspect-w-16 aspect-h-9">
                 {backdrop.thumbnailUrl ? (
-                  <Image
-                    src={backdrop.thumbnailUrl}
-                    alt={backdrop.name}
-                    width={400}
-                    height={225}
-                    className="w-full h-48 object-cover"
-                  />
+                  <div>
+                    <Image
+                      src={backdrop.thumbnailUrl}
+                      alt={backdrop.name}
+                      width={400}
+                      height={225}
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        console.error('Image failed to load:', backdrop.thumbnailUrl)
+                        console.error('Error:', e)
+                      }}
+                      onLoad={() => {
+                        console.log('Image loaded successfully:', backdrop.thumbnailUrl)
+                      }}
+                    />
+                    {/* Debug info */}
+                    <div className="text-xs text-gray-400 mt-1">
+                      Debug: {backdrop.thumbnailUrl}
+                    </div>
+                  </div>
                 ) : (
                   <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
                     <div className="text-center text-gray-500">
