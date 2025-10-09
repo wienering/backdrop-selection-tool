@@ -52,17 +52,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if email already exists
-    const existingAttendant = await prisma.attendant.findUnique({
-      where: { email }
-    })
-
-    if (existingAttendant) {
-      return NextResponse.json(
-        { error: 'An attendant with this email already exists' },
-        { status: 400 }
-      )
-    }
+    // No need to check for existing email since multiple attendants can use the same email
 
     const attendant = await prisma.attendant.create({
       data: { name, email }
