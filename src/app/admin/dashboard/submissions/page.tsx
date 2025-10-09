@@ -31,10 +31,20 @@ export default function ViewSubmissions() {
   const [filter, setFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [message, setMessage] = useState('')
+  const [customDateRange, setCustomDateRange] = useState({
+    startDate: '',
+    endDate: ''
+  })
+  const [showCustomRange, setShowCustomRange] = useState(false)
 
   useEffect(() => {
     fetchSubmissions()
   }, [])
+
+  const handleFilterChange = (newFilter: string) => {
+    setFilter(newFilter)
+    setShowCustomRange(newFilter === 'custom')
+  }
 
   const fetchSubmissions = async () => {
     try {
@@ -69,9 +79,43 @@ export default function ViewSubmissions() {
       submission.backdrop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       submission.attendant.name.toLowerCase().includes(searchTerm.toLowerCase())
 
-    const matchesFilter = filter === 'all' || 
-      (filter === 'recent' && new Date(submission.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
-      (filter === 'upcoming' && new Date(submission.eventDate) > new Date())
+    const now = new Date()
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+    const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000)
+    const next7Days = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)
+    const next30Days = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000)
+    const last7Days = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000)
+    
+    const eventDate = new Date(submission.eventDate)
+    const createdDate = new Date(submission.createdAt)
+
+    let matchesFilter = true
+
+    if (filter === 'all') {
+      matchesFilter = true
+    } else if (filter === 'recent') {
+      matchesFilter = createdDate > last7Days
+    } else if (filter === 'upcoming') {
+      matchesFilter = eventDate > today
+    } else if (filter === 'today') {
+      const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate())
+      matchesFilter = eventDateOnly.getTime() === today.getTime()
+    } else if (filter === 'tomorrow') {
+      const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate())
+      matchesFilter = eventDateOnly.getTime() === tomorrow.getTime()
+    } else if (filter === 'next7days') {
+      matchesFilter = eventDate >= today && eventDate <= next7Days
+    } else if (filter === 'next30days') {
+      matchesFilter = eventDate >= today && eventDate <= next30Days
+    } else if (filter === 'custom') {
+      if (customDateRange.startDate && customDateRange.endDate) {
+        const startDate = new Date(customDateRange.startDate + 'T00:00:00')
+        const endDate = new Date(customDateRange.endDate + 'T23:59:59')
+        matchesFilter = eventDate >= startDate && eventDate <= endDate
+      } else {
+        matchesFilter = false
+      }
+    }
 
     return matchesSearch && matchesFilter
   })
@@ -162,15 +206,55 @@ export default function ViewSubmissions() {
               <select
                 id="filter"
                 value={filter}
-                onChange={(e) => setFilter(e.target.value)}
+                onChange={(e) => handleFilterChange(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
               >
                 <option value="all">All Submissions</option>
                 <option value="recent">Last 7 Days</option>
                 <option value="upcoming">Upcoming Events</option>
+                <option value="today">Today</option>
+                <option value="tomorrow">Tomorrow</option>
+                <option value="next7days">Next 7 Days</option>
+                <option value="next30days">Next 30 Days</option>
+                <option value="custom">Custom Range</option>
               </select>
             </div>
           </div>
+          
+          {/* Custom Date Range */}
+          {showCustomRange && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    id="startDate"
+                    value={customDateRange.startDate}
+                    onChange={(e) => setCustomDateRange({ ...customDateRange, startDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    id="endDate"
+                    value={customDateRange.endDate}
+                    onChange={(e) => setCustomDateRange({ ...customDateRange, endDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                  />
+                </div>
+              </div>
+              {customDateRange.startDate && customDateRange.endDate && new Date(customDateRange.startDate) > new Date(customDateRange.endDate) && (
+                <p className="mt-2 text-sm text-red-600">Start date must be before end date</p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Stats */}
