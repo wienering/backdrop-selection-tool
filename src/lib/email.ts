@@ -1,4 +1,5 @@
 ﻿import nodemailer from 'nodemailer'
+import { formatEventDateForEmail } from './dateUtils'
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -29,12 +30,7 @@ export async function sendSubmissionNotification(
   eventDate: string,
   backdropName: string
 ) {
-  const formattedDate = new Date(eventDate).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  const formattedDate = formatEventDateForEmail(eventDate)
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
@@ -67,12 +63,7 @@ export async function sendClientConfirmation(
   eventDate: string,
   backdropName: string
 ) {
-  const formattedDate = new Date(eventDate).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
+  const formattedDate = formatEventDateForEmail(eventDate)
 
   await transporter.sendMail({
     from: process.env.SMTP_FROM,

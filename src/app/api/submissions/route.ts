@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendSubmissionNotification, sendClientConfirmation } from '@/lib/email'
+import { normalizeEventDate } from '@/lib/dateUtils'
 
 // GET all submissions
 export async function GET(request: NextRequest) {
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
       data: {
         clientName,
         clientEmail,
-        eventDate: new Date(eventDate),
+        eventDate: normalizeEventDate(eventDate),
         backdropId,
         attendantId
       },

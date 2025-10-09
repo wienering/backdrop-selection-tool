@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import AdminNav from '@/components/AdminNav'
 import Head from 'next/head'
+import { formatEventDate } from '@/lib/dateUtils'
 
 interface Submission {
   id: string
@@ -81,7 +82,7 @@ export default function ViewSubmissions() {
       ...filteredSubmissions.map(sub => [
         sub.clientName,
         sub.clientEmail,
-        new Date(sub.eventDate).toLocaleDateString(),
+        formatEventDate(sub.eventDate),
         sub.backdrop.name,
         sub.attendant.name,
         new Date(sub.createdAt).toLocaleDateString()
@@ -286,7 +287,7 @@ export default function ViewSubmissions() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(submission.eventDate).toLocaleDateString()}
+                        {formatEventDate(submission.eventDate)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
