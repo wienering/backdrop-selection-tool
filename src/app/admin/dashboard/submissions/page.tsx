@@ -94,7 +94,9 @@ export default function ViewSubmissions() {
     if (filter === 'all') {
       matchesFilter = true
     } else if (filter === 'recent') {
-      matchesFilter = createdDate > last7Days
+      matchesFilter = createdDate >= last7Days
+    } else if (filter === 'past7days') {
+      matchesFilter = eventDate >= last7Days && eventDate <= today
     } else if (filter === 'upcoming') {
       matchesFilter = eventDate > today
     } else if (filter === 'today') {
@@ -210,7 +212,8 @@ export default function ViewSubmissions() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
               >
                 <option value="all">All Submissions</option>
-                <option value="recent">Last 7 Days</option>
+                <option value="recent">Last 7 Days (Submissions)</option>
+                <option value="past7days">Past 7 Days (Events)</option>
                 <option value="upcoming">Upcoming Events</option>
                 <option value="today">Today</option>
                 <option value="tomorrow">Tomorrow</option>
@@ -287,7 +290,11 @@ export default function ViewSubmissions() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-700">This Week</p>
                 <p className="text-2xl font-semibold text-gray-900">
-                  {submissions.filter(s => new Date(s.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}
+                  {submissions.filter(s => {
+                    const createdDate = new Date(s.createdAt)
+                    const last7Days = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+                    return createdDate >= last7Days
+                  }).length}
                 </p>
               </div>
             </div>
