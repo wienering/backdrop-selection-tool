@@ -368,6 +368,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
             <button
               onClick={closeImageModal}
               className="absolute top-4 right-4 text-white text-5xl font-bold hover:text-gray-300 z-10 p-2"
+              style={{ textShadow: '1px 1px 0px black, -1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black' }}
             >
               ×
             </button>
@@ -387,6 +388,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     prevImage()
                   }}
                   className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-5xl font-bold hover:text-gray-300 z-10 p-2"
+                  style={{ textShadow: '1px 1px 0px black, -1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black' }}
                   disabled={currentImageIndex === 0}
                 >
                   ‹
@@ -397,12 +399,16 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     nextImage()
                   }}
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-5xl font-bold hover:text-gray-300 z-10 p-2"
+                  style={{ textShadow: '1px 1px 0px black, -1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black' }}
                   disabled={currentImageIndex === modalImages.length - 1}
                 >
                   ›
                 </button>
                 
-                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm">
+                <div 
+                  className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white text-sm"
+                  style={{ textShadow: '1px 1px 0px black, -1px -1px 0px black, 1px -1px 0px black, -1px 1px 0px black' }}
+                >
                   {currentImageIndex + 1} of {modalImages.length}
                 </div>
               </>
