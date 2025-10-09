@@ -13,10 +13,14 @@ export async function GET(
       include: {
         backdrops: {
           include: {
-            _count: {
-              select: {
-                images: true,
-                submissions: true
+            backdrop: {
+              include: {
+                _count: {
+                  select: {
+                    images: true,
+                    submissions: true
+                  }
+                }
               }
             }
           }
@@ -36,7 +40,16 @@ export async function GET(
       )
     }
 
-    return NextResponse.json(attendant)
+    // Transform the response to match the expected structure
+    const transformedAttendant = {
+      ...attendant,
+      backdrops: attendant.backdrops.map(ba => ({
+        ...ba.backdrop,
+        attendantId: attendant.id // Add attendantId for backward compatibility
+      }))
+    }
+
+    return NextResponse.json(transformedAttendant)
   } catch (error) {
     console.error('Error fetching attendant:', error)
     return NextResponse.json(
