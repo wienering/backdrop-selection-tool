@@ -83,7 +83,19 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
   }
 
   const openImageModal = (backdrop: Backdrop) => {
-    const allImages = [backdrop.thumbnailUrl, ...backdrop.images.map(img => img.imageUrl)]
+    // Create array of unique images, starting with thumbnail if it exists
+    const allImages = []
+    if (backdrop.thumbnailUrl) {
+      allImages.push(backdrop.thumbnailUrl)
+    }
+    
+    // Add additional images, avoiding duplicates
+    backdrop.images.forEach(img => {
+      if (img.imageUrl !== backdrop.thumbnailUrl) {
+        allImages.push(img.imageUrl)
+      }
+    })
+    
     setModalImages(allImages)
     setCurrentImageIndex(0)
     setModalImageUrl(allImages[0])
@@ -366,7 +378,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
           <div className="relative max-w-4xl max-h-full p-4">
             <button
               onClick={closeImageModal}
-              className="absolute top-4 right-4 text-white text-2xl font-bold hover:text-gray-300 z-10"
+              className="absolute top-4 right-4 text-white text-5xl font-bold hover:text-gray-300 z-10 p-2"
             >
               ×
             </button>
@@ -385,7 +397,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     e.stopPropagation()
                     prevImage()
                   }}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-2xl font-bold hover:text-gray-300 z-10"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white text-5xl font-bold hover:text-gray-300 z-10 p-2"
                   disabled={currentImageIndex === 0}
                 >
                   ‹
@@ -395,7 +407,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     e.stopPropagation()
                     nextImage()
                   }}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-2xl font-bold hover:text-gray-300 z-10"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-5xl font-bold hover:text-gray-300 z-10 p-2"
                   disabled={currentImageIndex === modalImages.length - 1}
                 >
                   ›
