@@ -87,10 +87,6 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
     // The thumbnail is just a preview - the modal should show the full gallery
     const allImages = backdrop.images.map(img => img.imageUrl)
     
-    // Debug logging
-    console.log('Thumbnail URL:', backdrop.thumbnailUrl)
-    console.log('Additional images:', backdrop.images.map(img => img.imageUrl))
-    console.log('Final allImages array:', allImages)
     
     setModalImages(allImages)
     setCurrentImageIndex(0)
@@ -192,9 +188,6 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
           </h1>
           <p className="text-xl text-gray-600 mb-2">
             Select the ideal backdrop for your photo booth experience
-          </p>
-          <p className="text-sm text-gray-500">
-            Attendant: {attendant.name}
           </p>
         </div>
 
