@@ -83,18 +83,14 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
   }
 
   const openImageModal = (backdrop: Backdrop) => {
-    // Create array of unique images, starting with thumbnail if it exists
-    const allImages = []
-    if (backdrop.thumbnailUrl) {
-      allImages.push(backdrop.thumbnailUrl)
-    }
+    // Only show the additional images, not the thumbnail
+    // The thumbnail is just a preview - the modal should show the full gallery
+    const allImages = backdrop.images.map(img => img.imageUrl)
     
-    // Add additional images, avoiding duplicates
-    backdrop.images.forEach(img => {
-      if (img.imageUrl !== backdrop.thumbnailUrl) {
-        allImages.push(img.imageUrl)
-      }
-    })
+    // Debug logging
+    console.log('Thumbnail URL:', backdrop.thumbnailUrl)
+    console.log('Additional images:', backdrop.images.map(img => img.imageUrl))
+    console.log('Final allImages array:', allImages)
     
     setModalImages(allImages)
     setCurrentImageIndex(0)
