@@ -35,6 +35,7 @@ model Backdrop {
   description   String?
   thumbnailUrl  String
   publicStatus  Boolean  @default(true)
+  order         Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -62,6 +63,7 @@ model BackdropImage {
   id         String   @id @default(cuid())
   backdropId String
   imageUrl   String
+  order      Int      @default(0)
   createdAt  DateTime @default(now())
 
   backdrop   Backdrop @relation(fields: [backdropId], references: [id], onDelete: Cascade)

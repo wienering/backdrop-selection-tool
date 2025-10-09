@@ -29,10 +29,16 @@ export async function POST(
       )
     }
 
+    // Get the current count of images to set the order
+    const imageCount = await prisma.backdropImage.count({
+      where: { backdropId: id }
+    })
+
     const backdropImage = await prisma.backdropImage.create({
       data: {
         backdropId: id,
-        imageUrl
+        imageUrl,
+        order: imageCount
       }
     })
 

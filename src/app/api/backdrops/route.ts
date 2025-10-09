@@ -29,7 +29,11 @@ export async function GET(request: NextRequest) {
             }
           }
         },
-        images: true,
+        images: {
+          orderBy: {
+            order: 'asc'
+          }
+        },
         _count: {
           select: {
             submissions: true
@@ -37,7 +41,7 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: {
-        createdAt: 'desc'
+        order: 'asc'
       }
     })
 
@@ -75,12 +79,16 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Get the current count of backdrops to set the order
+    const backdropCount = await prisma.backdrop.count()
+
     const backdrop = await prisma.backdrop.create({
       data: {
         name,
         description,
         thumbnailUrl: thumbnailUrl || '',
         publicStatus,
+        order: backdropCount,
         attendants: {
           create: attendantIds.map((attendantId: string) => ({
             attendantId

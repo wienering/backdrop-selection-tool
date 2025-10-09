@@ -5,6 +5,25 @@ import Link from 'next/link'
 import Image from 'next/image'
 import AdminNav from '@/components/AdminNav'
 import Head from 'next/head'
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import {
+  useSortable,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 interface Attendant {
   id: string
@@ -38,6 +57,229 @@ interface Backdrop {
   }
 }
 
+// Sortable Image Item Component
+function SortableImageItem({ image, onImageModalOpen, onDeleteImage }: {
+  image: BackdropImage
+  onImageModalOpen: (imageUrl: string) => void
+  onDeleteImage: (imageId: string) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: image.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="relative group cursor-pointer"
+      onClick={() => onImageModalOpen(image.imageUrl)}
+    >
+      <img
+        src={image.imageUrl}
+        alt="Backdrop image"
+        className="w-full h-16 object-cover rounded hover:opacity-80 transition-opacity"
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.style.display = 'none';
+          const parent = target.parentElement;
+          if (parent) {
+            parent.innerHTML = `
+              <div class="w-full h-16 bg-gray-200 rounded flex items-center justify-center">
+                <span class="text-xs text-gray-500">Broken</span>
+              </div>
+            `;
+          }
+        }}
+      />
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          onDeleteImage(image.id);
+        }}
+        className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        ×
+      </button>
+      <div
+        {...attributes}
+        {...listeners}
+        className="absolute top-1 left-1 bg-gray-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity cursor-grab active:cursor-grabbing"
+      >
+        ⋮⋮
+      </div>
+    </div>
+  )
+}
+
+// Sortable Backdrop Item Component
+function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, onDeleteImage, onReorderImages }: {
+  backdrop: Backdrop
+  onEdit: (backdrop: Backdrop) => void
+  onDelete: (id: string) => void
+  onImageModalOpen: (imageUrl: string) => void
+  onDeleteImage: (backdropId: string, imageId: string) => void
+  onReorderImages: (backdropId: string, imageIds: string[]) => void
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: backdrop.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="bg-white rounded-lg shadow-md overflow-hidden"
+    >
+      <div className="w-full h-48 bg-gray-100 overflow-hidden relative">
+        {backdrop.thumbnailUrl ? (
+          <>
+            <img
+              src={backdrop.thumbnailUrl}
+              alt={backdrop.name}
+              className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => onImageModalOpen(backdrop.thumbnailUrl)}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const parent = target.parentElement;
+                if (parent) {
+                  parent.innerHTML = `
+                    <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                      <div class="text-center text-gray-500">
+                        <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        <p class="text-sm">Thumbnail failed to load</p>
+                      </div>
+                    </div>
+                  `;
+                }
+              }}
+            />
+          </>
+        ) : (
+          <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
+            <div className="text-center text-gray-500">
+              <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <p className="text-sm">No thumbnail</p>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-semibold text-gray-900">{backdrop.name}</h3>
+          <div className="flex items-center space-x-2">
+            <span className={`px-2 py-1 text-xs rounded-full ${
+              backdrop.publicStatus 
+                ? 'bg-green-100 text-green-800' 
+                : 'bg-gray-100 text-gray-800'
+            }`}>
+              {backdrop.publicStatus ? 'Public' : 'Private'}
+            </span>
+            <div
+              {...attributes}
+              {...listeners}
+              className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
+              </svg>
+            </div>
+          </div>
+        </div>
+        <p className="text-sm text-gray-600 mb-2">
+          Active for: {backdrop.attendants.map(ba => ba.attendant.name).join(', ')}
+        </p>
+        {backdrop.description && (
+          <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+            {backdrop.description}
+          </p>
+        )}
+        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+          <span>{backdrop.images.length} images</span>
+          <span>{backdrop._count.submissions} selections</span>
+        </div>
+        
+        {backdrop.images.length > 0 && (
+          <div className="mb-4">
+            <h4 className="text-sm font-medium text-gray-700 mb-2">Images:</h4>
+            <DndContext
+              sensors={useSensors(useSensor(PointerSensor))}
+              collisionDetection={closestCenter}
+              onDragEnd={(event) => {
+                const { active, over } = event
+                if (over && active.id !== over.id) {
+                  const oldIndex = backdrop.images.findIndex((image) => image.id === active.id)
+                  const newIndex = backdrop.images.findIndex((image) => image.id === over.id)
+                  const newImages = arrayMove(backdrop.images, oldIndex, newIndex)
+                  const imageIds = newImages.map(image => image.id)
+                  onReorderImages(backdrop.id, imageIds)
+                }
+              }}
+            >
+              <SortableContext
+                items={backdrop.images.map(image => image.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="grid grid-cols-3 gap-2">
+                  {backdrop.images.map((image) => (
+                    <SortableImageItem
+                      key={image.id}
+                      image={image}
+                      onImageModalOpen={onImageModalOpen}
+                      onDeleteImage={(imageId) => onDeleteImage(backdrop.id, imageId)}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
+          </div>
+        )}
+
+        <div className="flex space-x-2">
+          <button
+            onClick={() => onEdit(backdrop)}
+            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(backdrop.id)}
+            className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function ManageBackdrops() {
   const [backdrops, setBackdrops] = useState<Backdrop[]>([])
   const [attendants, setAttendants] = useState<Attendant[]>([])
@@ -57,6 +299,13 @@ export default function ManageBackdrops() {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([])
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null)
   const [modalImageUrl, setModalImageUrl] = useState<string | null>(null)
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
 
   useEffect(() => {
     fetchData()
@@ -274,6 +523,61 @@ export default function ManageBackdrops() {
     setModalImageUrl(null)
   }
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (over && active.id !== over.id) {
+      const oldIndex = backdrops.findIndex((backdrop) => backdrop.id === active.id)
+      const newIndex = backdrops.findIndex((backdrop) => backdrop.id === over.id)
+
+      const newBackdrops = arrayMove(backdrops, oldIndex, newIndex)
+      setBackdrops(newBackdrops)
+
+      // Update the order in the database
+      try {
+        const backdropIds = newBackdrops.map(backdrop => backdrop.id)
+        await fetch('/api/backdrops/reorder', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ backdropIds })
+        })
+      } catch (error) {
+        console.error('Error reordering backdrops:', error)
+        setMessage('Failed to save backdrop order. Please refresh the page.')
+        // Revert the local state
+        fetchData()
+      }
+    }
+  }
+
+  const handleReorderImages = async (backdropId: string, imageIds: string[]) => {
+    try {
+      await fetch(`/api/backdrops/${backdropId}/images/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageIds })
+      })
+      
+      // Update local state
+      setBackdrops(prevBackdrops => 
+        prevBackdrops.map(backdrop => 
+          backdrop.id === backdropId 
+            ? {
+                ...backdrop,
+                images: imageIds.map(id => 
+                  backdrop.images.find(img => img.id === id)!
+                )
+              }
+            : backdrop
+        )
+      )
+    } catch (error) {
+      console.error('Error reordering images:', error)
+      setMessage('Failed to save image order. Please refresh the page.')
+      fetchData()
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
@@ -448,127 +752,30 @@ export default function ManageBackdrops() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {backdrops.map((backdrop) => (
-            <div key={backdrop.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <div className="w-full h-48 bg-gray-100 overflow-hidden relative">
-                {backdrop.thumbnailUrl ? (
-                  <>
-                    <img
-                      src={backdrop.thumbnailUrl}
-                      alt={backdrop.name}
-                      className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() => openImageModal(backdrop.thumbnailUrl)}
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent) {
-                          parent.innerHTML = `
-                            <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                              <div class="text-center text-gray-500">
-                                <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <p class="text-sm">Thumbnail failed to load</p>
-                              </div>
-                            </div>
-                          `;
-                        }
-                      }}
-                    />
-                  </>
-                ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                    <div className="text-center text-gray-500">
-                      <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <p className="text-sm">No thumbnail</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">{backdrop.name}</h3>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    backdrop.publicStatus 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {backdrop.publicStatus ? 'Public' : 'Private'}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 mb-2">
-                  Active for: {backdrop.attendants.map(ba => ba.attendant.name).join(', ')}
-                </p>
-                {backdrop.description && (
-                  <p className="text-sm text-gray-500 mb-3 line-clamp-2">
-                    {backdrop.description}
-                  </p>
-                )}
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                  <span>{backdrop.images.length} images</span>
-                  <span>{backdrop._count.submissions} selections</span>
-                </div>
-                
-                {backdrop.images.length > 0 && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Images:</h4>
-                    <div className="grid grid-cols-3 gap-2">
-                      {backdrop.images.map((image) => (
-                        <div key={image.id} className="relative group cursor-pointer" onClick={() => openImageModal(image.imageUrl)}>
-                          <img
-                            src={image.imageUrl}
-                            alt="Backdrop image"
-                            className="w-full h-16 object-cover rounded hover:opacity-80 transition-opacity"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                              const parent = target.parentElement;
-                              if (parent) {
-                                parent.innerHTML = `
-                                  <div class="w-full h-16 bg-gray-200 rounded flex items-center justify-center">
-                                    <span class="text-xs text-gray-500">Broken</span>
-                                  </div>
-                                `;
-                              }
-                            }}
-                          />
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteImage(backdrop.id, image.id);
-                            }}
-                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => handleEdit(backdrop)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(backdrop.id)}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={backdrops.map(backdrop => backdrop.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {backdrops.map((backdrop) => (
+                <SortableBackdropItem
+                  key={backdrop.id}
+                  backdrop={backdrop}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onImageModalOpen={openImageModal}
+                  onDeleteImage={handleDeleteImage}
+                  onReorderImages={handleReorderImages}
+                />
+              ))}
             </div>
-          ))}
-        </div>
+          </SortableContext>
+        </DndContext>
 
         {backdrops.length === 0 && (
           <div className="text-center py-12">
