@@ -219,7 +219,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                   <div>
                     <p className="font-medium text-gray-900">{selectedBackdrop.name}</p>
                     {selectedBackdrop.description && (
-                      <p className="text-sm text-gray-600">{selectedBackdrop.description}</p>
+                      <p className="text-sm text-gray-800">{selectedBackdrop.description}</p>
                     )}
                   </div>
                 </div>
@@ -227,7 +227,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="clientName" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="clientName" className="block text-sm font-medium text-gray-900 mb-2">
                     Your Name *
                   </label>
                   <input
@@ -235,13 +235,13 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     id="clientName"
                     value={formData.clientName}
                     onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="clientEmail" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="clientEmail" className="block text-sm font-medium text-gray-900 mb-2">
                     Your Email *
                   </label>
                   <input
@@ -249,13 +249,13 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     id="clientEmail"
                     value={formData.clientEmail}
                     onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="eventDate" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="eventDate" className="block text-sm font-medium text-gray-900 mb-2">
                     Event Date *
                   </label>
                   <input
@@ -263,7 +263,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     id="eventDate"
                     value={formData.eventDate}
                     onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                     required
                   />
                 </div>
