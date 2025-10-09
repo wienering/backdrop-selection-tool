@@ -18,15 +18,20 @@ interface BackdropImage {
   createdAt: string
 }
 
+interface BackdropAttendant {
+  id: string
+  attendantId: string
+  attendant: Attendant
+}
+
 interface Backdrop {
   id: string
   name: string
   description: string | null
   thumbnailUrl: string
   publicStatus: boolean
-  attendantId: string
   createdAt: string
-  attendant: Attendant
+  attendants: BackdropAttendant[]
   images: BackdropImage[]
   _count: {
     submissions: number
@@ -42,7 +47,7 @@ export default function ManageBackdrops() {
   const [formData, setFormData] = useState({ 
     name: '', 
     description: '', 
-    attendantId: '', 
+    attendantIds: [] as string[], 
     publicStatus: true,
     thumbnailUrl: ''
   })
@@ -118,6 +123,13 @@ export default function ManageBackdrops() {
     setIsSubmitting(true)
     setMessage('')
 
+    // Validate that at least one attendant is selected
+    if (formData.attendantIds.length === 0) {
+      setMessage('Please select at least one attendant')
+      setIsSubmitting(false)
+      return
+    }
+
     try {
       let thumbnailUrl = formData.thumbnailUrl || ''
 
@@ -190,11 +202,20 @@ export default function ManageBackdrops() {
     setFormData({ 
       name: backdrop.name, 
       description: backdrop.description || '', 
-      attendantId: backdrop.attendantId,
+      attendantIds: backdrop.attendants.map(ba => ba.attendantId),
       publicStatus: backdrop.publicStatus,
       thumbnailUrl: backdrop.thumbnailUrl
     })
     setShowForm(true)
+  }
+
+  const handleAttendantToggle = (attendantId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      attendantIds: prev.attendantIds.includes(attendantId)
+        ? prev.attendantIds.filter(id => id !== attendantId)
+        : [...prev.attendantIds, attendantId]
+    }))
   }
 
   const handleDelete = async (id: string) => {
@@ -238,7 +259,7 @@ export default function ManageBackdrops() {
   }
 
   const resetForm = () => {
-    setFormData({ name: '', description: '', attendantId: '', publicStatus: true, thumbnailUrl: '' })
+    setFormData({ name: '', description: '', attendantIds: [], publicStatus: true, thumbnailUrl: '' })
     setEditingBackdrop(null)
     setShowForm(false)
     setSelectedFiles([])
@@ -320,23 +341,27 @@ export default function ManageBackdrops() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="attendantId" className="block text-sm font-medium text-gray-900 mb-2">
-                    Attendant *
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Activate for Attendants *
                   </label>
-                  <select
-                    id="attendantId"
-                    value={formData.attendantId}
-                    onChange={(e) => setFormData({ ...formData, attendantId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                    required
-                  >
-                    <option value="">Select an attendant</option>
+                  <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded-md p-3">
                     {attendants.map((attendant) => (
-                      <option key={attendant.id} value={attendant.id}>
-                        {attendant.name} ({attendant.email})
-                      </option>
+                      <label key={attendant.id} className="flex items-center space-x-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.attendantIds.includes(attendant.id)}
+                          onChange={() => handleAttendantToggle(attendant.id)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <span className="text-sm text-gray-900">
+                          {attendant.name} ({attendant.email})
+                        </span>
+                      </label>
                     ))}
-                  </select>
+                  </div>
+                  {formData.attendantIds.length === 0 && (
+                    <p className="text-red-500 text-xs mt-1">Please select at least one attendant</p>
+                  )}
                 </div>
               </div>
               
@@ -476,7 +501,7 @@ export default function ManageBackdrops() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mb-2">
-                  By {backdrop.attendant.name}
+                  Active for: {backdrop.attendants.map(ba => ba.attendant.name).join(', ')}
                 </p>
                 {backdrop.description && (
                   <p className="text-sm text-gray-500 mb-3 line-clamp-2">

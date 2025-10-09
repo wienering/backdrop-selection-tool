@@ -10,13 +10,23 @@ export async function GET(request: NextRequest) {
     const where = attendantId ? { attendantId } : {}
 
     const backdrops = await prisma.backdrop.findMany({
-      where,
+      where: attendantId ? {
+        attendants: {
+          some: {
+            attendantId: attendantId
+          }
+        }
+      } : {},
       include: {
-        attendant: {
-          select: {
-            id: true,
-            name: true,
-            email: true
+        attendants: {
+          include: {
+            attendant: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            }
           }
         },
         images: true,
@@ -44,23 +54,23 @@ export async function GET(request: NextRequest) {
 // POST create new backdrop
 export async function POST(request: NextRequest) {
   try {
-    const { name, description, thumbnailUrl, attendantId, publicStatus = true } = await request.json()
+    const { name, description, thumbnailUrl, attendantIds, publicStatus = true } = await request.json()
 
-    if (!name || !attendantId) {
+    if (!name || !attendantIds || attendantIds.length === 0) {
       return NextResponse.json(
-        { error: 'Name and attendant ID are required' },
+        { error: 'Name and at least one attendant ID are required' },
         { status: 400 }
       )
     }
 
-    // Verify attendant exists
-    const attendant = await prisma.attendant.findUnique({
-      where: { id: attendantId }
+    // Verify all attendants exist
+    const attendants = await prisma.attendant.findMany({
+      where: { id: { in: attendantIds } }
     })
 
-    if (!attendant) {
+    if (attendants.length !== attendantIds.length) {
       return NextResponse.json(
-        { error: 'Attendant not found' },
+        { error: 'One or more attendants not found' },
         { status: 404 }
       )
     }
@@ -70,15 +80,23 @@ export async function POST(request: NextRequest) {
         name,
         description,
         thumbnailUrl: thumbnailUrl || '',
-        attendantId,
-        publicStatus
+        publicStatus,
+        attendants: {
+          create: attendantIds.map((attendantId: string) => ({
+            attendantId
+          }))
+        }
       },
       include: {
-        attendant: {
-          select: {
-            id: true,
-            name: true,
-            email: true
+        attendants: {
+          include: {
+            attendant: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            }
           }
         }
       }

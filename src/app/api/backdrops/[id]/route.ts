@@ -11,11 +11,15 @@ export async function GET(
     const backdrop = await prisma.backdrop.findUnique({
       where: { id },
       include: {
-        attendant: {
-          select: {
-            id: true,
-            name: true,
-            email: true
+        attendants: {
+          include: {
+            attendant: {
+              select: {
+                id: true,
+                name: true,
+                email: true
+              }
+            }
           }
         },
         images: true,
@@ -56,7 +60,7 @@ export async function PUT(
 ) {
   try {
     const { id } = await params
-    const { name, description, publicStatus, thumbnailUrl } = await request.json()
+    const { name, description, publicStatus, thumbnailUrl, attendantIds } = await request.json()
 
     if (!name) {
       return NextResponse.json(
@@ -65,27 +69,80 @@ export async function PUT(
       )
     }
 
-    const backdrop = await prisma.backdrop.update({
-      where: { id },
-      data: {
-        name,
-        description,
-        publicStatus,
-        ...(thumbnailUrl && { thumbnailUrl })
-      },
-      include: {
-        attendant: {
-          select: {
-            id: true,
-            name: true,
-            email: true
+    // If attendantIds are provided, update the many-to-many relationship
+    if (attendantIds && attendantIds.length > 0) {
+      // Verify all attendants exist
+      const attendants = await prisma.attendant.findMany({
+        where: { id: { in: attendantIds } }
+      })
+
+      if (attendants.length !== attendantIds.length) {
+        return NextResponse.json(
+          { error: 'One or more attendants not found' },
+          { status: 404 }
+        )
+      }
+
+      // Update backdrop and replace attendant relationships
+      const backdrop = await prisma.backdrop.update({
+        where: { id },
+        data: {
+          name,
+          description,
+          publicStatus,
+          ...(thumbnailUrl && { thumbnailUrl }),
+          attendants: {
+            deleteMany: {}, // Remove all existing relationships
+            create: attendantIds.map((attendantId: string) => ({
+              attendantId
+            }))
           }
         },
-        images: true
-      }
-    })
+        include: {
+          attendants: {
+            include: {
+              attendant: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          },
+          images: true
+        }
+      })
 
-    return NextResponse.json(backdrop)
+      return NextResponse.json(backdrop)
+    } else {
+      // Just update backdrop properties without changing attendants
+      const backdrop = await prisma.backdrop.update({
+        where: { id },
+        data: {
+          name,
+          description,
+          publicStatus,
+          ...(thumbnailUrl && { thumbnailUrl })
+        },
+        include: {
+          attendants: {
+            include: {
+              attendant: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true
+                }
+              }
+            }
+          },
+          images: true
+        }
+      })
+
+      return NextResponse.json(backdrop)
+    }
   } catch (error) {
     console.error('Error updating backdrop:', error)
     return NextResponse.json(

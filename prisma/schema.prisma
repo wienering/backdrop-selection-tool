@@ -23,7 +23,7 @@ model Attendant {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  backdrops Backdrop[]
+  backdrops BackdropAttendant[]
   submissions Submission[]
 
   @@map("attendants")
@@ -35,15 +35,27 @@ model Backdrop {
   description   String?
   thumbnailUrl  String
   publicStatus  Boolean  @default(true)
-  attendantId   String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  attendant     Attendant @relation(fields: [attendantId], references: [id], onDelete: Cascade)
+  attendants    BackdropAttendant[]
   images        BackdropImage[]
   submissions   Submission[]
 
   @@map("backdrops")
+}
+
+model BackdropAttendant {
+  id          String @id @default(cuid())
+  backdropId  String
+  attendantId String
+  createdAt   DateTime @default(now())
+
+  backdrop    Backdrop @relation(fields: [backdropId], references: [id], onDelete: Cascade)
+  attendant   Attendant @relation(fields: [attendantId], references: [id], onDelete: Cascade)
+
+  @@unique([backdropId, attendantId])
+  @@map("backdrop_attendants")
 }
 
 model BackdropImage {
