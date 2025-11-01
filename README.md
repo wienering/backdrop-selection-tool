@@ -35,6 +35,31 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
    npm run db:migrate-order
    ```
 
+## Environment Variables
+
+Required environment variables:
+
+- `DATABASE_URL` - PostgreSQL database connection string
+- `SMTP_HOST` - SMTP server host for sending emails
+- `SMTP_PORT` - SMTP server port (typically 587 or 465)
+- `SMTP_USER` - SMTP authentication username
+- `SMTP_PASSWORD` - SMTP authentication password
+- `SMTP_FROM` - Email address to send from
+- `NEXT_PUBLIC_BASE_URL` - Base URL of the application
+- `AGREEMENTS_API_URL` - (Optional) Base URL of the agreements app API for automatic backdrop selection recording. When set, backdrop selections will automatically update matching agreements.
+
+Example `.env`:
+```
+DATABASE_URL="postgresql://..."
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_USER="user@example.com"
+SMTP_PASSWORD="password"
+SMTP_FROM="noreply@photoboothguys.ca"
+NEXT_PUBLIC_BASE_URL="https://your-domain.com"
+AGREEMENTS_API_URL="https://agreements-app.com"
+```
+
 ## Drag and Drop Usage
 
 ### Reordering Backdrops

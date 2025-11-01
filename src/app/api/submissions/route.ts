@@ -139,6 +139,36 @@ export async function POST(request: NextRequest) {
       // Don't fail the submission if email fails
     }
 
+    // Update agreements app with backdrop selection (non-blocking)
+    const agreementsApiUrl = process.env.AGREEMENTS_API_URL
+    if (agreementsApiUrl) {
+      try {
+        const response = await fetch(`${agreementsApiUrl}/api/agreements/update-backdrop-selection`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            clientEmail,
+            clientName,
+            eventDate,
+            backdropName: backdrop.name,
+          }),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}))
+          console.error('Agreements API returned error:', response.status, errorData)
+        } else {
+          const result = await response.json()
+          console.log('Successfully updated agreements with backdrop selection:', result.updatedCount, 'agreement(s) updated')
+        }
+      } catch (apiError) {
+        console.error('Error calling agreements API to update backdrop selection:', apiError)
+        // Don't fail the submission if agreements API call fails
+      }
+    }
+
     return NextResponse.json(submission, { status: 201 })
   } catch (error) {
     console.error('Error creating submission:', error)
