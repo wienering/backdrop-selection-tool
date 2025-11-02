@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdminAuth } from '@/lib/auth'
 
 // PUT reorder backdrops
 export async function PUT(request: NextRequest) {
+  // Require admin authentication
+  const authError = requireAdminAuth(request)
+  if (authError) return authError
+
   try {
     const { backdropIds } = await request.json()
 

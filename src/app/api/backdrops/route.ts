@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdminAuth } from '@/lib/auth'
 
 // GET all backdrops
+// Public endpoint - can be accessed with or without attendantId for client selection pages
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -57,6 +59,10 @@ export async function GET(request: NextRequest) {
 
 // POST create new backdrop
 export async function POST(request: NextRequest) {
+  // Require admin authentication
+  const authError = requireAdminAuth(request)
+  if (authError) return authError
+
   try {
     const { name, description, thumbnailUrl, attendantIds, publicStatus = true } = await request.json()
 

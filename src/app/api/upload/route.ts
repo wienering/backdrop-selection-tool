@@ -3,8 +3,13 @@ import { put } from '@vercel/blob'
 import { writeFile, mkdir } from 'fs/promises'
 import { join } from 'path'
 import { existsSync } from 'fs'
+import { requireAdminAuth } from '@/lib/auth'
 
 export async function POST(request: NextRequest) {
+  // Require admin authentication
+  const authError = requireAdminAuth(request)
+  if (authError) return authError
+
   try {
     const data = await request.formData()
     const file: File | null = data.get('file') as unknown as File

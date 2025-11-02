@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { requireAdminAuth } from '@/lib/auth'
 
 // GET all attendants
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const authError = requireAdminAuth(request)
+  if (authError) return authError
   try {
     // Test database connection first
     await prisma.$connect()
@@ -42,6 +46,10 @@ export async function GET() {
 
 // POST create new attendant
 export async function POST(request: NextRequest) {
+  // Require admin authentication
+  const authError = requireAdminAuth(request)
+  if (authError) return authError
+
   try {
     const { name, email } = await request.json()
 

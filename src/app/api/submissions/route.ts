@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendSubmissionNotification, sendClientConfirmation } from '@/lib/email'
 import { normalizeEventDate } from '@/lib/dateUtils'
+import { requireAdminAuth } from '@/lib/auth'
 
 // GET all submissions
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const authError = requireAdminAuth(request)
+  if (authError) return authError
+
   try {
     const { searchParams } = new URL(request.url)
     const attendantId = searchParams.get('attendantId')

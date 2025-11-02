@@ -28,6 +28,7 @@ interface Submission {
 export default function ViewSubmissions() {
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [filter, setFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [message, setMessage] = useState('')
@@ -38,7 +39,24 @@ export default function ViewSubmissions() {
   const [showCustomRange, setShowCustomRange] = useState(false)
 
   useEffect(() => {
-    fetchSubmissions()
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/auth/session')
+        const data = await response.json()
+        setIsAuthenticated(data.authenticated)
+        if (data.authenticated) {
+          fetchSubmissions()
+        } else {
+          setIsLoading(false)
+        }
+      } catch (error) {
+        console.error('Auth check error:', error)
+        setIsAuthenticated(false)
+        setIsLoading(false)
+      }
+    }
+
+    checkAuth()
   }, [])
 
   const handleFilterChange = (newFilter: string) => {
@@ -149,7 +167,25 @@ export default function ViewSubmissions() {
       <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#F5A623] mx-auto"></div>
-          <p className="mt-4 text-gray-100">Loading submissions...</p>
+          <p className="mt-4 text-gray-100">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
+        <AdminNav />
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
+          <p className="text-gray-100 mb-4">Please log in to access the admin dashboard.</p>
+          <Link
+            href="/admin"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#F5A623] hover:bg-[#e0941a]"
+          >
+            Go to Login
+          </Link>
         </div>
       </div>
     )
