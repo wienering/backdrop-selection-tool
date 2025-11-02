@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { jwtVerify } from 'jose'
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Skip middleware for API routes (including auth routes)
@@ -41,9 +41,10 @@ export function middleware(request: NextRequest) {
     }
 
     try {
-      // Verify the JWT token
-      const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET || 'fallback-secret')
-      console.log('Token verified successfully:', decoded)
+      // Verify the JWT token using jose (Edge-compatible)
+      const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'fallback-secret')
+      const { payload } = await jwtVerify(token, secret)
+      console.log('Token verified successfully:', payload)
       // Token is valid, allow the request to proceed
       return NextResponse.next()
     } catch (error) {
