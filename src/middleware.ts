@@ -12,29 +12,45 @@ export function middleware(request: NextRequest) {
 
   // Protect all /admin routes except /admin itself (the login page)
   if (pathname.startsWith('/admin') && pathname !== '/admin') {
+    console.log('=== MIDDLEWARE CHECK ===')
+    console.log('Pathname:', pathname)
+    console.log('Request URL:', request.url)
+    
+    const allCookies = request.cookies.getAll()
+    console.log('All cookies received:', allCookies.map(c => ({ name: c.name, value: c.value?.substring(0, 20) + '...' })))
+    
     const token = request.cookies.get('admin-session')?.value
     const authFlag = request.cookies.get('admin-authenticated')?.value
+    
+    console.log('admin-session cookie:', token ? 'PRESENT' : 'MISSING')
+    console.log('admin-authenticated cookie:', authFlag ? 'PRESENT' : 'MISSING')
 
     // If no token, check if we just authenticated (temporary flag set during redirect)
     if (!token) {
+      console.log('No session token found')
       // If auth flag exists, give a moment for the session cookie to be available
       // This handles the case where cookie is set during redirect but not yet in request
       if (authFlag === 'true') {
+        console.log('Auth flag found, allowing through')
         // Allow through - the cookie should be available
         return NextResponse.next()
       }
       // Redirect to login if no token
+      console.log('No token or auth flag, redirecting to login')
       return NextResponse.redirect(new URL('/admin', request.url))
     }
 
     try {
       // Verify the JWT token
-      jwt.verify(token, process.env.NEXTAUTH_SECRET || 'fallback-secret')
+      const decoded = jwt.verify(token, process.env.NEXTAUTH_SECRET || 'fallback-secret')
+      console.log('Token verified successfully:', decoded)
       // Token is valid, allow the request to proceed
       return NextResponse.next()
     } catch (error) {
       // Token is invalid, redirect to login
-      console.error('Invalid token in middleware:', error)
+      console.error('=== TOKEN VERIFICATION FAILED ===')
+      console.error('Error:', error)
+      console.error('Token value:', token?.substring(0, 50))
       return NextResponse.redirect(new URL('/admin', request.url))
     }
   }
