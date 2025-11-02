@@ -5,6 +5,11 @@ import jwt from 'jsonwebtoken'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Skip middleware for API routes (including auth routes)
+  if (pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
+
   // Protect all /admin routes except /admin itself (the login page)
   if (pathname.startsWith('/admin') && pathname !== '/admin') {
     const token = request.cookies.get('admin-session')?.value
