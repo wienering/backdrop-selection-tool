@@ -13,8 +13,16 @@ export function middleware(request: NextRequest) {
   // Protect all /admin routes except /admin itself (the login page)
   if (pathname.startsWith('/admin') && pathname !== '/admin') {
     const token = request.cookies.get('admin-session')?.value
+    const authFlag = request.cookies.get('admin-authenticated')?.value
 
+    // If no token, check if we just authenticated (temporary flag set during redirect)
     if (!token) {
+      // If auth flag exists, give a moment for the session cookie to be available
+      // This handles the case where cookie is set during redirect but not yet in request
+      if (authFlag === 'true') {
+        // Allow through - the cookie should be available
+        return NextResponse.next()
+      }
       // Redirect to login if no token
       return NextResponse.redirect(new URL('/admin', request.url))
     }
@@ -26,6 +34,7 @@ export function middleware(request: NextRequest) {
       return NextResponse.next()
     } catch (error) {
       // Token is invalid, redirect to login
+      console.error('Invalid token in middleware:', error)
       return NextResponse.redirect(new URL('/admin', request.url))
     }
   }
