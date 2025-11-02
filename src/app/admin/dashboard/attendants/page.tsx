@@ -128,10 +128,10 @@ export default function ManageAttendants() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
+      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading attendants...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#F5A623] mx-auto"></div>
+          <p className="mt-4 text-gray-100">Loading attendants...</p>
         </div>
       </div>
     )
@@ -143,18 +143,18 @@ export default function ManageAttendants() {
         <title>Manage Attendants - Photo Booth Backdrop Tool</title>
         <meta name="description" content="Add, edit, and manage photo booth attendants" />
       </Head>
-      <div className="min-h-screen bg-[#FAFAF8]">
+      <div className="min-h-screen bg-[#adadad]">
         <AdminNav />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Manage Attendants</h1>
-              <p className="mt-2 text-gray-600">Add, edit, and manage photo booth attendants</p>
+              <p className="mt-2 text-gray-100">Add, edit, and manage photo booth attendants</p>
             </div>
             <button
               onClick={() => setShowForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+              className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md font-medium"
             >
               Add New Attendant
             </button>
@@ -173,12 +173,12 @@ export default function ManageAttendants() {
 
         {showForm && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-xl font-semibold text-white mb-4">
               {editingAttendant ? 'Edit Attendant' : 'Add New Attendant'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
                   Name
                 </label>
                 <input
@@ -192,7 +192,7 @@ export default function ManageAttendants() {
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                   Email
                 </label>
                 <input
@@ -209,7 +209,7 @@ export default function ManageAttendants() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50 transition-colors"
+                  className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md font-medium disabled:opacity-50 transition-colors"
                 >
                   {isSubmitting ? 'Saving...' : (editingAttendant ? 'Update' : 'Create')}
                 </button>

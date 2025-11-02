@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Head from 'next/head'
 import Link from 'next/link'
+import PageHeader from '@/components/PageHeader'
+import BackgroundIllustrations from '@/components/BackgroundIllustrations'
 
 interface BackdropImage {
   id: string
@@ -148,10 +150,12 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading backdrops...</p>
+      <div className="min-h-screen bg-[#adadad] relative overflow-hidden flex items-center justify-center">
+        <BackgroundIllustrations />
+        <PageHeader />
+        <div className="relative z-10 text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#F5A623] mx-auto"></div>
+          <p className="mt-4 text-white">Loading backdrops...</p>
         </div>
       </div>
     )
@@ -159,13 +163,15 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
 
   if (!attendant) {
     return (
-      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Invalid Selection Code</h1>
-          <p className="text-gray-600 mb-4">The code you entered is not valid. Please check with your photo booth attendant.</p>
+      <div className="min-h-screen bg-[#adadad] relative overflow-hidden flex items-center justify-center">
+        <BackgroundIllustrations />
+        <PageHeader />
+        <div className="relative z-10 text-center">
+          <h1 className="text-2xl font-bold text-white mb-4">Invalid Selection Code</h1>
+          <p className="text-gray-100 mb-4">The code you entered is not valid. Please check with your photo booth attendant.</p>
           <Link
             href="/"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#F5A623] hover:bg-[#e0941a]"
           >
             Try Again
           </Link>
@@ -180,13 +186,15 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
         <title>Select Your Backdrop - Photo Booth</title>
         <meta name="description" content="Choose your perfect backdrop for your photo booth experience" />
       </Head>
-      <div className="min-h-screen bg-[#FAFAF8]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-[#adadad] relative overflow-hidden">
+        <BackgroundIllustrations />
+        <PageHeader />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4">
             Choose Your Perfect Backdrop
           </h1>
-          <p className="text-xl text-gray-600 mb-2">
+          <p className="text-xl text-gray-100 mb-2">
             Select the ideal backdrop for your photo booth experience
           </p>
         </div>
@@ -235,7 +243,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     id="clientName"
                     value={formData.clientName}
                     onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-gray-900 placeholder-gray-500"
                     required
                   />
                 </div>
@@ -249,7 +257,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     id="clientEmail"
                     value={formData.clientEmail}
                     onChange={(e) => setFormData({ ...formData, clientEmail: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-gray-900 placeholder-gray-500"
                     required
                   />
                 </div>
@@ -263,7 +271,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     id="eventDate"
                     value={formData.eventDate}
                     onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-gray-900"
                     required
                   />
                 </div>
@@ -272,7 +280,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50"
+                    className="flex-1 bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md font-medium disabled:opacity-50"
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit Selection'}
                   </button>
@@ -320,14 +328,14 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                     {backdrop.images.length > 0 && (
                       <button
                         onClick={() => openImageModal(backdrop)}
-                        className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+                        className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
                       >
                         View Images
                       </button>
                     )}
                     <button
                       onClick={() => handleBackdropSelect(backdrop)}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
+                      className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                     >
                       Select This Backdrop
                     </button>
@@ -345,15 +353,15 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No backdrops available</h3>
-            <p className="text-gray-500">Please check with your photo booth attendant.</p>
+            <h3 className="text-lg font-medium text-white mb-2">No backdrops available</h3>
+            <p className="text-gray-100">Please check with your photo booth attendant.</p>
           </div>
         )}
 
         <div className="mt-8 text-center">
           <Link
             href="/"
-            className="text-blue-600 hover:text-blue-500"
+            className="text-white hover:text-gray-200 transition-colors"
           >
             ← Back to Home
           </Link>

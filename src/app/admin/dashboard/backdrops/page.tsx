@@ -204,7 +204,7 @@ function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, on
             <div
               {...attributes}
               {...listeners}
-              className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600"
+              className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-100"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
@@ -212,7 +212,7 @@ function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, on
             </div>
           </div>
         </div>
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-sm text-gray-100 mb-2">
           Active for: {backdrop.attendants.map(ba => ba.attendant.name).join(', ')}
         </p>
         {backdrop.description && (
@@ -264,7 +264,7 @@ function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, on
         <div className="flex space-x-2">
           <button
             onClick={() => onEdit(backdrop)}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+            className="flex-1 bg-[#F5A623] hover:bg-[#e0941a] text-white px-3 py-2 rounded-md text-sm font-medium"
           >
             Edit
           </button>
@@ -580,10 +580,10 @@ export default function ManageBackdrops() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FAFAF8] flex items-center justify-center">
+      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading backdrops...</p>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#F5A623] mx-auto"></div>
+          <p className="mt-4 text-gray-100">Loading backdrops...</p>
         </div>
       </div>
     )
@@ -595,18 +595,18 @@ export default function ManageBackdrops() {
         <title>Manage Backdrops - Photo Booth Backdrop Tool</title>
         <meta name="description" content="Upload and organize backdrop photos for photo booth" />
       </Head>
-      <div className="min-h-screen bg-[#FAFAF8]">
+      <div className="min-h-screen bg-[#adadad]">
         <AdminNav />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Manage Backdrops</h1>
-              <p className="mt-2 text-gray-600">Upload and organize backdrop photos</p>
+              <p className="mt-2 text-gray-100">Upload and organize backdrop photos</p>
             </div>
             <button
               onClick={() => setShowForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+              className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md font-medium"
             >
               Add New Backdrop
             </button>
@@ -625,13 +625,13 @@ export default function ManageBackdrops() {
 
         {showForm && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            <h2 className="text-xl font-semibold text-white mb-4">
               {editingBackdrop ? 'Edit Backdrop' : 'Add New Backdrop'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-900 mb-2">
+                  <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
                     Name *
                   </label>
                   <input
@@ -645,7 +645,7 @@ export default function ManageBackdrops() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                  <label className="block text-sm font-medium text-white mb-2">
                     Activate for Attendants *
                   </label>
                   <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded-md p-3">
@@ -670,7 +670,7 @@ export default function ManageBackdrops() {
               </div>
               
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="description" className="block text-sm font-medium text-white mb-2">
                   Description
                 </label>
                 <textarea
@@ -684,7 +684,7 @@ export default function ManageBackdrops() {
               </div>
 
               <div>
-                <label htmlFor="thumbnail" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="thumbnail" className="block text-sm font-medium text-white mb-2">
                   Thumbnail Image {!editingBackdrop && '*'}
                 </label>
                 <input
@@ -696,14 +696,14 @@ export default function ManageBackdrops() {
                   required={!editingBackdrop}
                 />
                 {editingBackdrop && (
-                  <p className="mt-1 text-sm text-gray-600">
+                  <p className="mt-1 text-sm text-gray-100">
                     Leave empty to keep current thumbnail
                   </p>
                 )}
               </div>
 
               <div>
-                <label htmlFor="images" className="block text-sm font-medium text-gray-900 mb-2">
+                <label htmlFor="images" className="block text-sm font-medium text-white mb-2">
                   Additional Images
                 </label>
                 <input
@@ -714,7 +714,7 @@ export default function ManageBackdrops() {
                   onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 />
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-gray-100">
                   Select multiple images to add to this backdrop
                 </p>
               </div>
@@ -736,7 +736,7 @@ export default function ManageBackdrops() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium disabled:opacity-50 transition-colors"
+                  className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md font-medium disabled:opacity-50 transition-colors"
                 >
                   {isSubmitting ? 'Saving...' : (editingBackdrop ? 'Update' : 'Create')}
                 </button>
@@ -784,11 +784,11 @@ export default function ManageBackdrops() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No backdrops found</h3>
+            <h3 className="text-lg font-medium text-white mb-2">No backdrops found</h3>
             <p className="text-gray-500 mb-4">Get started by adding your first backdrop.</p>
             <button
               onClick={() => setShowForm(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md font-medium"
+              className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md font-medium"
             >
               Add First Backdrop
             </button>
