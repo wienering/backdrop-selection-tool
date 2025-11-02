@@ -41,18 +41,18 @@ export default function AdminNav() {
       <nav className="bg-[#adadad] backdrop-blur-sm border-b border-gray-400/20 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            <div className="flex">
+            <div className="flex flex-1 min-w-0">
               <div className="flex-shrink-0 flex items-center">
-                <Link href="/admin/dashboard" className="text-xl font-bold text-white">
+                <Link href="/admin/dashboard" className="text-lg md:text-xl font-bold text-white whitespace-nowrap">
                   Photobooth Guys Backdrops
                 </Link>
               </div>
-              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+              <div className="hidden lg:ml-6 lg:flex lg:space-x-6 xl:space-x-8 flex-shrink-0">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium whitespace-nowrap ${
                       pathname === item.href
                         ? 'border-[#F5A623] text-white'
                         : 'border-transparent text-gray-100 hover:border-gray-300 hover:text-white'
@@ -64,10 +64,10 @@ export default function AdminNav() {
                 ))}
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-3 flex-shrink-0 ml-2">
               <Link
                 href="/"
-                className="hidden sm:block text-white hover:text-gray-200 px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                className="hidden lg:block text-white hover:text-gray-200 px-2 md:px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap"
               >
                 View Site
               </Link>
@@ -76,13 +76,13 @@ export default function AdminNav() {
                   await fetch('/api/auth/session', { method: 'DELETE' })
                   window.location.href = '/admin'
                 }}
-                className="hidden sm:block text-white border border-[#F5A623] bg-transparent hover:bg-[#F5A623]/10 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                className="hidden lg:block text-white border border-[#F5A623] bg-transparent hover:bg-[#F5A623]/10 px-3 md:px-4 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap"
               >
                 Logout
               </button>
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="sm:hidden text-white hover:text-gray-200 p-2 rounded-md"
+                className="lg:hidden text-white hover:text-gray-200 p-2 rounded-md flex-shrink-0"
               >
                 <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -93,7 +93,7 @@ export default function AdminNav() {
           
           {/* Mobile menu */}
           {mobileMenuOpen && (
-            <div className="sm:hidden">
+            <div className="lg:hidden">
               <div className="pt-2 pb-3 space-y-1">
                 {navItems.map((item) => (
                   <Link
