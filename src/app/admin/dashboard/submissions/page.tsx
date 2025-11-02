@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import AdminNav from '@/components/AdminNav'
+import DashboardSidebar from '@/components/DashboardSidebar'
 import Head from 'next/head'
 import { formatEventDate } from '@/lib/dateUtils'
 
@@ -164,10 +165,10 @@ export default function ViewSubmissions() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1a1a1f] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#F5A623] mx-auto"></div>
-          <p className="mt-4 text-gray-100">Loading...</p>
+          <p className="mt-4 text-white">Loading...</p>
         </div>
       </div>
     )
@@ -175,7 +176,7 @@ export default function ViewSubmissions() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1a1a1f] flex items-center justify-center">
         <AdminNav />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
@@ -197,14 +198,16 @@ export default function ViewSubmissions() {
         <title>View Submissions - Photo Booth Backdrop Tool</title>
         <meta name="description" content="View and manage client backdrop selections" />
       </Head>
-      <div className="min-h-screen bg-[#adadad]">
-        <AdminNav />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-[#1a1a1f] flex">
+        <DashboardSidebar />
+        <div className="flex-1 flex flex-col">
+          <AdminNav />
+          <div className="flex-1 p-6 overflow-y-auto">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">View Submissions</h1>
-              <p className="mt-2 text-gray-100">See client backdrop selections</p>
+              <h1 className="text-3xl font-bold text-white">View Submissions</h1>
+              <p className="mt-2 text-gray-400">See client backdrop selections</p>
             </div>
             <button
               onClick={exportSubmissions}
@@ -216,16 +219,16 @@ export default function ViewSubmissions() {
         </div>
 
         {message && (
-          <div className="mb-6 p-4 rounded-md bg-red-50 text-red-800 border border-red-200">
+          <div className="mb-6 p-4 rounded-md bg-red-900/30 text-red-400 border border-red-700">
             {message}
           </div>
         )}
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div className="bg-[#24242A] rounded-xl border border-gray-800 p-6 mb-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-300 mb-2">
                 Search
               </label>
               <input
@@ -234,18 +237,18 @@ export default function ViewSubmissions() {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by name, email, backdrop, or attendant..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
+                className="w-full px-3 py-2 bg-[#1a1a1f] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-white placeholder-gray-500"
               />
             </div>
             <div>
-              <label htmlFor="filter" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="filter" className="block text-sm font-medium text-gray-300 mb-2">
                 Filter
               </label>
               <select
                 id="filter"
                 value={filter}
                 onChange={(e) => handleFilterChange(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                className="w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] text-white"
               >
                 <option value="all">All Submissions</option>
                 <option value="recent">Last 7 Days (Submissions)</option>
@@ -265,7 +268,7 @@ export default function ViewSubmissions() {
             <div className="mt-4 pt-4 border-t border-gray-200">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="startDate" className="block text-sm font-medium text-gray-300 mb-2">
                     Start Date
                   </label>
                   <input
@@ -273,11 +276,11 @@ export default function ViewSubmissions() {
                     id="startDate"
                     value={customDateRange.startDate}
                     onChange={(e) => setCustomDateRange({ ...customDateRange, startDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] text-white"
                   />
                 </div>
                 <div>
-                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="endDate" className="block text-sm font-medium text-gray-300 mb-2">
                     End Date
                   </label>
                   <input
@@ -285,7 +288,7 @@ export default function ViewSubmissions() {
                     id="endDate"
                     value={customDateRange.endDate}
                     onChange={(e) => setCustomDateRange({ ...customDateRange, endDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+                    className="w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] text-white"
                   />
                 </div>
               </div>
@@ -298,7 +301,7 @@ export default function ViewSubmissions() {
 
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-[#24242A] rounded-xl border border-gray-800 p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
@@ -308,13 +311,13 @@ export default function ViewSubmissions() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-700">Total Submissions</p>
-                <p className="text-2xl font-semibold text-gray-900">{submissions.length}</p>
+                <p className="text-sm font-medium text-gray-300">Total Submissions</p>
+                <p className="text-2xl font-semibold text-white">{submissions.length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-[#24242A] rounded-xl border border-gray-800 p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-green-100 rounded-md flex items-center justify-center">
@@ -324,8 +327,8 @@ export default function ViewSubmissions() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-700">This Week</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-sm font-medium text-gray-300">This Week</p>
+                <p className="text-2xl font-semibold text-white">
                   {submissions.filter(s => {
                     const createdDate = new Date(s.createdAt)
                     const last7Days = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
@@ -336,7 +339,7 @@ export default function ViewSubmissions() {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-[#24242A] rounded-xl border border-gray-800 p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <div className="w-8 h-8 bg-yellow-100 rounded-md flex items-center justify-center">
@@ -346,8 +349,8 @@ export default function ViewSubmissions() {
                 </div>
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-700">Upcoming Events</p>
-                <p className="text-2xl font-semibold text-gray-900">
+                <p className="text-sm font-medium text-gray-300">Upcoming Events</p>
+                <p className="text-2xl font-semibold text-white">
                   {submissions.filter(s => new Date(s.eventDate) > new Date()).length}
                 </p>
               </div>
@@ -356,9 +359,9 @@ export default function ViewSubmissions() {
         </div>
 
         {/* Submissions List */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-[#24242A] rounded-xl border border-gray-800 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
+            <h2 className="text-lg font-semibold text-white">
               Submissions ({filteredSubmissions.length})
             </h2>
           </div>
@@ -371,7 +374,7 @@ export default function ViewSubmissions() {
                 </svg>
               </div>
               <h3 className="text-lg font-medium text-white mb-2">No submissions found</h3>
-              <p className="text-gray-500">
+              <p className="text-gray-400">
                 {searchTerm || filter !== 'all' 
                   ? 'Try adjusting your search or filter criteria.'
                   : 'Submissions will appear here when clients make their selections.'
@@ -380,40 +383,40 @@ export default function ViewSubmissions() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-700">
+                <thead className="bg-[#2a2a2f]">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Client
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Event Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Backdrop
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Attendant
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                       Submitted
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-[#24242A] divide-y divide-gray-700">
                   {filteredSubmissions.map((submission) => (
-                    <tr key={submission.id} className="hover:bg-gray-50">
+                    <tr key={submission.id} className="hover:bg-[#2a2a2f]">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-white">
                             {submission.clientName}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm text-gray-400">
                             {submission.clientEmail}
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                         {formatEventDate(submission.eventDate)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -428,21 +431,21 @@ export default function ViewSubmissions() {
                             />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium text-white">
                               {submission.backdrop.name}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-white">
                           {submission.attendant.name}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-400">
                           {submission.attendant.email}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                         {new Date(submission.createdAt).toLocaleDateString()}
                       </td>
                     </tr>
@@ -453,14 +456,7 @@ export default function ViewSubmissions() {
           )}
         </div>
 
-        <div className="mt-8">
-          <Link
-            href="/admin/dashboard"
-            className="text-blue-600 hover:text-blue-500"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
+          </div>
         </div>
       </div>
     </>

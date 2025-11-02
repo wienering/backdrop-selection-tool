@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import AdminNav from '@/components/AdminNav'
+import DashboardSidebar from '@/components/DashboardSidebar'
 import Head from 'next/head'
 
 interface Attendant {
@@ -146,10 +147,10 @@ export default function ManageAttendants() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1a1a1f] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#F5A623] mx-auto"></div>
-          <p className="mt-4 text-gray-100">Loading...</p>
+          <p className="mt-4 text-white">Loading...</p>
         </div>
       </div>
     )
@@ -157,7 +158,7 @@ export default function ManageAttendants() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1a1a1f] flex items-center justify-center">
         <AdminNav />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
@@ -179,14 +180,16 @@ export default function ManageAttendants() {
         <title>Manage Attendants - Photo Booth Backdrop Tool</title>
         <meta name="description" content="Add, edit, and manage photo booth attendants" />
       </Head>
-      <div className="min-h-screen bg-[#adadad]">
-        <AdminNav />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-[#1a1a1f] flex">
+        <DashboardSidebar />
+        <div className="flex-1 flex flex-col">
+          <AdminNav />
+          <div className="flex-1 p-6 overflow-y-auto">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Manage Attendants</h1>
-              <p className="mt-2 text-gray-100">Add, edit, and manage photo booth attendants</p>
+              <h1 className="text-3xl font-bold text-white">Manage Attendants</h1>
+              <p className="mt-2 text-gray-400">Add, edit, and manage photo booth attendants</p>
             </div>
             <button
               onClick={() => setShowForm(true)}
@@ -198,23 +201,23 @@ export default function ManageAttendants() {
         </div>
 
         {message && (
-          <div className={`mb-6 p-4 rounded-md ${
+          <div className={`mb-6 p-4 rounded-lg ${
             message.includes('successfully') 
-              ? 'bg-green-50 text-green-800 border border-green-200' 
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'bg-green-900/30 text-green-400 border border-green-700' 
+              : 'bg-red-900/30 text-red-400 border border-red-700'
           }`}>
             {message}
           </div>
         )}
 
         {showForm && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="bg-[#24242A] rounded-xl border border-gray-800 p-6 mb-8">
             <h2 className="text-xl font-semibold text-white mb-4">
               {editingAttendant ? 'Edit Attendant' : 'Add New Attendant'}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
                   Name
                 </label>
                 <input
@@ -223,12 +226,12 @@ export default function ManageAttendants() {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="Enter attendant name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                  className="w-full px-3 py-2 bg-[#1a1a1f] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-white placeholder-gray-500"
                   required
                 />
               </div>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
                   Email
                 </label>
                 <input
@@ -237,7 +240,7 @@ export default function ManageAttendants() {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="Enter email address"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                  className="w-full px-3 py-2 bg-[#1a1a1f] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-white placeholder-gray-500"
                   required
                 />
               </div>
@@ -252,7 +255,7 @@ export default function ManageAttendants() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md font-medium transition-colors"
+                  className="bg-[#3a3a3f] hover:bg-[#4a4a4f] text-gray-300 px-4 py-2 rounded-md font-medium transition-colors"
                 >
                   Cancel
                 </button>
@@ -261,50 +264,50 @@ export default function ManageAttendants() {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">All Attendants</h2>
+        <div className="bg-[#24242A] rounded-xl border border-gray-800 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-700">
+            <h2 className="text-lg font-semibold text-white">All Attendants</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-700">
+              <thead className="bg-[#2a2a2f]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Backdrops
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Submissions
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Created
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-[#24242A] divide-y divide-gray-700">
                 {attendants.map((attendant) => (
-                  <tr key={attendant.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <tr key={attendant.id} className="hover:bg-[#2a2a2f]">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                       {attendant.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                       {attendant.email}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                       {attendant._count.backdrops}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                       {attendant._count.submissions}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                       {new Date(attendant.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -327,20 +330,20 @@ export default function ManageAttendants() {
                               setTimeout(() => setShowCopyModal(false), 2000);
                             });
                           }}
-                          className="text-green-600 hover:text-green-900 font-medium"
+                          className="text-green-400 hover:text-green-300 font-medium"
                           title="Copy selection link"
                         >
                           Copy Link
                         </button>
                         <button
                           onClick={() => handleEdit(attendant)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-400 hover:text-blue-300"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(attendant.id)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-400 hover:text-red-300"
                         >
                           Delete
                         </button>
@@ -351,36 +354,29 @@ export default function ManageAttendants() {
               </tbody>
             </table>
             {attendants.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-gray-400">
                 No attendants found. Add your first attendant to get started.
               </div>
             )}
           </div>
         </div>
 
-        <div className="mt-8">
-          <Link
-            href="/admin/dashboard"
-            className="text-blue-600 hover:text-blue-500"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
+          </div>
         </div>
       </div>
 
       {/* Copy Success Modal */}
       {showCopyModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg">
+          <div className="bg-[#24242A] border border-gray-700 rounded-lg p-6 shadow-lg">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <svg className="h-6 w-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="h-6 w-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-white">
                   Selection link copied to clipboard!
                 </p>
               </div>

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import AdminNav from '@/components/AdminNav'
+import DashboardSidebar from '@/components/DashboardSidebar'
 import Head from 'next/head'
 import {
   DndContext,
@@ -96,7 +97,7 @@ function SortableImageItem({ image, onImageModalOpen, onDeleteImage }: {
           if (parent) {
             parent.innerHTML = `
               <div class="w-full h-16 bg-gray-200 rounded flex items-center justify-center">
-                <span class="text-xs text-gray-500">Broken</span>
+                <span class="text-xs text-gray-400">Broken</span>
               </div>
             `;
           }
@@ -150,9 +151,9 @@ function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, on
     <div
       ref={setNodeRef}
       style={style}
-      className="bg-white rounded-lg shadow-md overflow-hidden"
+      className="bg-[#24242A] rounded-xl border border-gray-800 overflow-hidden"
     >
-      <div className="w-full h-48 bg-gray-100 overflow-hidden relative">
+      <div className="w-full h-48 bg-[#2a2a2f] overflow-hidden relative">
         {backdrop.thumbnailUrl ? (
           <>
             <img
@@ -167,7 +168,7 @@ function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, on
                 if (parent) {
                   parent.innerHTML = `
                     <div class="w-full h-full bg-gray-200 flex items-center justify-center">
-                      <div class="text-center text-gray-500">
+                      <div class="text-center text-gray-400">
                         <svg class="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -181,7 +182,7 @@ function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, on
           </>
         ) : (
           <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-            <div className="text-center text-gray-500">
+            <div className="text-center text-gray-400">
               <svg className="w-12 h-12 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -192,19 +193,19 @@ function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, on
       </div>
       <div className="p-4">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="text-lg font-semibold text-gray-900">{backdrop.name}</h3>
+          <h3 className="text-lg font-semibold text-white">{backdrop.name}</h3>
           <div className="flex items-center space-x-2">
             <span className={`px-2 py-1 text-xs rounded-full ${
               backdrop.publicStatus 
                 ? 'bg-green-100 text-green-800' 
-                : 'bg-gray-100 text-gray-800'
+                : 'bg-[#2a2a2f] text-gray-800'
             }`}>
               {backdrop.publicStatus ? 'Public' : 'Private'}
             </span>
             <div
               {...attributes}
               {...listeners}
-              className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-100"
+              className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-300"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8h16M4 16h16" />
@@ -212,15 +213,15 @@ function SortableBackdropItem({ backdrop, onEdit, onDelete, onImageModalOpen, on
             </div>
           </div>
         </div>
-        <p className="text-sm text-gray-100 mb-2">
+        <p className="text-sm text-gray-300 mb-2">
           Active for: {backdrop.attendants.map(ba => ba.attendant.name).join(', ')}
         </p>
         {backdrop.description && (
-          <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+          <p className="text-sm text-gray-400 mb-3 line-clamp-2">
             {backdrop.description}
           </p>
         )}
-        <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
+        <div className="flex items-center justify-between text-sm text-gray-400 mb-4">
           <span>{backdrop.images.length} images</span>
           <span>{backdrop._count.submissions} selections</span>
         </div>
@@ -598,10 +599,10 @@ export default function ManageBackdrops() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1a1a1f] flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#F5A623] mx-auto"></div>
-          <p className="mt-4 text-gray-100">Loading...</p>
+          <p className="mt-4 text-white">Loading...</p>
         </div>
       </div>
     )
@@ -609,11 +610,11 @@ export default function ManageBackdrops() {
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-[#adadad] flex items-center justify-center">
+      <div className="min-h-screen bg-[#1a1a1f] flex items-center justify-center">
         <AdminNav />
         <div className="text-center">
           <h1 className="text-2xl font-bold text-white mb-4">Access Denied</h1>
-          <p className="text-gray-100 mb-4">Please log in to access the admin dashboard.</p>
+          <p className="text-gray-300 mb-4">Please log in to access the admin dashboard.</p>
           <Link
             href="/admin"
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#F5A623] hover:bg-[#e0941a]"
@@ -631,14 +632,16 @@ export default function ManageBackdrops() {
         <title>Manage Backdrops - Photo Booth Backdrop Tool</title>
         <meta name="description" content="Upload and organize backdrop photos for photo booth" />
       </Head>
-      <div className="min-h-screen bg-[#adadad]">
-        <AdminNav />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="min-h-screen bg-[#1a1a1f] flex">
+        <DashboardSidebar />
+        <div className="flex-1 flex flex-col">
+          <AdminNav />
+          <div className="flex-1 p-6 overflow-y-auto">
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Manage Backdrops</h1>
-              <p className="mt-2 text-gray-100">Upload and organize backdrop photos</p>
+              <h1 className="text-3xl font-bold text-white">Manage Backdrops</h1>
+              <p className="mt-2 text-gray-400">Upload and organize backdrop photos</p>
             </div>
             <button
               onClick={() => setShowForm(true)}
@@ -652,15 +655,15 @@ export default function ManageBackdrops() {
         {message && (
           <div className={`mb-6 p-4 rounded-md ${
             message.includes('successfully') 
-              ? 'bg-green-50 text-green-800 border border-green-200' 
-              : 'bg-red-50 text-red-800 border border-red-200'
+              ? 'bg-green-900/30 text-green-400 border border-green-700' 
+              : 'bg-red-900/30 text-red-400 border border-red-700'
           }`}>
             {message}
           </div>
         )}
 
         {showForm && (
-          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="bg-[#24242A] rounded-xl border border-gray-800 p-6 mb-8">
             <h2 className="text-xl font-semibold text-white mb-4">
               {editingBackdrop ? 'Edit Backdrop' : 'Add New Backdrop'}
             </h2>
@@ -676,7 +679,7 @@ export default function ManageBackdrops() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Enter backdrop name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                    className="w-full px-3 py-2 bg-[#1a1a1f] border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-white placeholder-gray-500"
                     required
                   />
                 </div>
@@ -684,7 +687,7 @@ export default function ManageBackdrops() {
                   <label className="block text-sm font-medium text-white mb-2">
                     Activate for Attendants *
                   </label>
-                  <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded-md p-3">
+                  <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-700 rounded-md p-3">
                     {attendants.map((attendant) => (
                       <label key={attendant.id} className="flex items-center space-x-2 cursor-pointer">
                         <input
@@ -693,7 +696,7 @@ export default function ManageBackdrops() {
                           onChange={() => handleAttendantToggle(attendant.id)}
                           className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                         />
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm text-white">
                           {attendant.name} ({attendant.email})
                         </span>
                       </label>
@@ -715,7 +718,7 @@ export default function ManageBackdrops() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   placeholder="Enter backdrop description (optional)"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
+                  className="w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-white placeholder-gray-500"
                 />
               </div>
 
@@ -728,11 +731,11 @@ export default function ManageBackdrops() {
                   id="thumbnail"
                   accept="image/*"
                   onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  className="w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-white"
                   required={!editingBackdrop}
                 />
                 {editingBackdrop && (
-                  <p className="mt-1 text-sm text-gray-100">
+                  <p className="mt-1 text-sm text-gray-300">
                     Leave empty to keep current thumbnail
                   </p>
                 )}
@@ -748,9 +751,9 @@ export default function ManageBackdrops() {
                   accept="image/*"
                   multiple
                   onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+                  className="w-full px-3 py-2 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-[#F5A623] focus:border-[#F5A623] text-white"
                 />
-                <p className="mt-1 text-sm text-gray-100">
+                <p className="mt-1 text-sm text-gray-300">
                   Select multiple images to add to this backdrop
                 </p>
               </div>
@@ -763,7 +766,7 @@ export default function ManageBackdrops() {
                   onChange={(e) => setFormData({ ...formData, publicStatus: e.target.checked })}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <label htmlFor="publicStatus" className="ml-2 block text-sm text-gray-900">
+                <label htmlFor="publicStatus" className="ml-2 block text-sm text-white">
                   Make this backdrop public (visible to clients)
                 </label>
               </div>
@@ -779,7 +782,7 @@ export default function ManageBackdrops() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md font-medium transition-colors"
+                  className="bg-[#3a3a3f] hover:bg-[#4a4a4f] text-gray-300 px-4 py-2 rounded-md font-medium transition-colors"
                 >
                   Cancel
                 </button>
@@ -821,7 +824,7 @@ export default function ManageBackdrops() {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-white mb-2">No backdrops found</h3>
-            <p className="text-gray-500 mb-4">Get started by adding your first backdrop.</p>
+            <p className="text-gray-400 mb-4">Get started by adding your first backdrop.</p>
             <button
               onClick={() => setShowForm(true)}
               className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md font-medium"
@@ -831,14 +834,7 @@ export default function ManageBackdrops() {
           </div>
         )}
 
-        <div className="mt-8">
-          <Link
-            href="/admin/dashboard"
-            className="text-blue-600 hover:text-blue-500"
-          >
-            ← Back to Dashboard
-          </Link>
-        </div>
+          </div>
         </div>
       </div>
 
