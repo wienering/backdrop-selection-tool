@@ -44,7 +44,7 @@ export default function AdminLogin() {
       </Head>
       <div className="min-h-screen bg-[#adadad] relative overflow-hidden">
         {/* Photo Booth Background Illustrations */}
-        <div className="absolute inset-0 opacity-10">
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
           <svg className="absolute top-20 left-10 w-32 h-32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="20" y="30" width="60" height="50" stroke="white" strokeWidth="2" fill="none" rx="4"/>
             <rect x="25" y="35" width="50" height="40" stroke="white" strokeWidth="1.5" fill="none"/>
@@ -77,7 +77,7 @@ export default function AdminLogin() {
         </div>
 
         {/* Top Bar with Contact Info */}
-        <div className="bg-[#9a9a9a] text-white text-sm py-2">
+        <div className="bg-[#9a9a9a] text-white text-sm py-2 relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <div className="flex items-center space-x-6">
               <a href="mailto:info@photoboothguys.ca" className="flex items-center space-x-2 hover:text-gray-200 transition-colors">
