@@ -150,12 +150,14 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#adadad] relative overflow-hidden flex items-center justify-center">
+      <div className="min-h-screen bg-[#adadad] relative overflow-hidden">
         <BackgroundIllustrations />
         <PageHeader />
-        <div className="relative z-10 text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#F5A623] mx-auto"></div>
-          <p className="mt-4 text-white">Loading backdrops...</p>
+        <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-128px)] py-8 px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-24 w-24 sm:h-32 sm:w-32 border-b-2 border-[#F5A623] mx-auto"></div>
+            <p className="mt-4 text-base sm:text-lg text-white px-4">Loading backdrops...</p>
+          </div>
         </div>
       </div>
     )
@@ -163,18 +165,20 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
 
   if (!attendant) {
     return (
-      <div className="min-h-screen bg-[#adadad] relative overflow-hidden flex items-center justify-center">
+      <div className="min-h-screen bg-[#adadad] relative overflow-hidden">
         <BackgroundIllustrations />
         <PageHeader />
-        <div className="relative z-10 text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Invalid Selection Code</h1>
-          <p className="text-gray-100 mb-4">The code you entered is not valid. Please check with your photo booth attendant.</p>
-          <Link
-            href="/"
-            className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-[#F5A623] hover:bg-[#e0941a]"
-          >
-            Try Again
-          </Link>
+        <div className="relative z-10 flex items-center justify-center min-h-[calc(100vh-128px)] py-8 px-4 sm:px-6 lg:px-8">
+          <div className="w-full max-w-md text-center">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-4 px-4">Invalid Selection Code</h1>
+            <p className="text-base sm:text-lg text-gray-100 mb-6 px-4">The code you entered is not valid. Please check with your photo booth attendant.</p>
+            <Link
+              href="/"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base sm:text-lg font-medium rounded-md text-white bg-[#F5A623] hover:bg-[#e0941a] transition-colors"
+            >
+              Try Again
+            </Link>
+          </div>
         </div>
       </div>
     )
@@ -200,12 +204,12 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
         </div>
 
         {message && (
-          <div className={`mb-8 p-4 rounded-md text-center ${
+          <div className={`mb-6 sm:mb-8 p-3 sm:p-4 rounded-md text-center mx-4 sm:mx-0 ${
             message.includes('Thank you') || message.includes('successfully')
               ? 'bg-green-50 text-green-800 border border-green-200'
               : 'bg-red-50 text-red-800 border border-red-200'
           }`}>
-            {message}
+            <p className="text-sm sm:text-base">{message}</p>
           </div>
         )}
 
