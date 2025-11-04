@@ -189,12 +189,12 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
       <div className="min-h-screen bg-[#adadad] relative overflow-hidden">
         <BackgroundIllustrations />
         <PageHeader />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 px-4">
             Choose Your Perfect Backdrop
           </h1>
-          <p className="text-xl text-gray-100 mb-2">
+          <p className="text-lg sm:text-xl text-gray-100 mb-2 px-4">
             Select the ideal backdrop for your photo booth experience
           </p>
         </div>
@@ -210,9 +210,9 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
         )}
 
         {showSubmissionForm && selectedBackdrop && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Submit Your Selection</h2>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 my-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Submit Your Selection</h2>
               
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-700 mb-2">Selected Backdrop:</h3>
@@ -297,7 +297,7 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {backdrops.map((backdrop) => (
             <div key={backdrop.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               <div className="aspect-w-16 aspect-h-9 relative">
@@ -324,18 +324,18 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
                   <span className="text-sm text-gray-500">
                     {backdrop.images.length + 1} image{(backdrop.images.length + 1) !== 1 ? 's' : ''}
                   </span>
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     {backdrop.images.length > 0 && (
                       <button
                         onClick={() => openImageModal(backdrop)}
-                        className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                        className="bg-gray-600 hover:bg-gray-700 text-white px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors"
                       >
                         View Images
                       </button>
                     )}
                     <button
                       onClick={() => handleBackdropSelect(backdrop)}
-                      className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                      className="bg-[#F5A623] hover:bg-[#e0941a] text-white px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors"
                     >
                       Select This Backdrop
                     </button>

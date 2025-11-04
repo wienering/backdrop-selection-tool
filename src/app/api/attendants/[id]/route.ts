@@ -3,38 +3,19 @@ import { prisma } from '@/lib/prisma'
 import { requireAdminAuth } from '@/lib/auth'
 
 // GET single attendant
+// Public endpoint - no authentication required for viewing attendant info
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  // Require admin authentication
-  const authError = requireAdminAuth(request)
-  if (authError) return authError
-
   try {
     const { id } = await params
     const attendant = await prisma.attendant.findUnique({
       where: { id },
-      include: {
-        backdrops: {
-          include: {
-            backdrop: {
-              include: {
-                _count: {
-                  select: {
-                    images: true,
-                    submissions: true
-                  }
-                }
-              }
-            }
-          }
-        },
-        submissions: {
-          include: {
-            backdrop: true
-          }
-        }
+      select: {
+        id: true,
+        name: true,
+        email: true
       }
     })
 
@@ -45,16 +26,8 @@ export async function GET(
       )
     }
 
-    // Transform the response to match the expected structure
-    const transformedAttendant = {
-      ...attendant,
-      backdrops: attendant.backdrops.map(ba => ({
-        ...ba.backdrop,
-        attendantId: attendant.id // Add attendantId for backward compatibility
-      }))
-    }
-
-    return NextResponse.json(transformedAttendant)
+    // Return only basic attendant info (no sensitive data like backdrops/submissions)
+    return NextResponse.json(attendant)
   } catch (error) {
     console.error('Error fetching attendant:', error)
     return NextResponse.json(
