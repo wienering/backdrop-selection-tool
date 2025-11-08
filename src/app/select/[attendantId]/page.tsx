@@ -37,7 +37,8 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
   const [formData, setFormData] = useState({
     clientName: '',
     clientEmail: '',
-    eventDate: ''
+    eventDate: '',
+    agreementId: '' // Add agreementId to form data
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
@@ -48,6 +49,16 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
   useEffect(() => {
     const loadData = async () => {
       const { attendantId } = await params
+      
+      // Read agreementId from URL query parameter
+      if (typeof window !== 'undefined') {
+        const urlParams = new URLSearchParams(window.location.search)
+        const agreementId = urlParams.get('agreementId')
+        if (agreementId) {
+          setFormData(prev => ({ ...prev, agreementId }))
+        }
+      }
+      
       fetchData(attendantId)
     }
     loadData()
@@ -136,7 +147,9 @@ export default function SelectBackdrop({ params }: { params: Promise<{ attendant
       if (response.ok) {
         setMessage('Thank you! Your backdrop selection has been submitted successfully.')
         setShowSubmissionForm(false)
-        setFormData({ clientName: '', clientEmail: '', eventDate: '' })
+        // Preserve agreementId when resetting form (in case user wants to select another backdrop)
+        const agreementId = formData.agreementId
+        setFormData({ clientName: '', clientEmail: '', eventDate: '', agreementId })
         setSelectedBackdrop(null)
       } else {
         setMessage(data.error || 'Something went wrong. Please try again.')

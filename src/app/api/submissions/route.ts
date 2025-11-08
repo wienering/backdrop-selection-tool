@@ -55,11 +55,11 @@ export async function GET(request: NextRequest) {
 // POST create new submission
 export async function POST(request: NextRequest) {
   try {
-    const { clientName, clientEmail, eventDate, backdropId, attendantId } = await request.json()
+    const { clientName, clientEmail, eventDate, backdropId, attendantId, agreementId } = await request.json()
 
     if (!clientName || !clientEmail || !eventDate || !backdropId || !attendantId) {
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: 'All required fields are missing' },
         { status: 400 }
       )
     }
@@ -148,17 +148,27 @@ export async function POST(request: NextRequest) {
     const agreementsApiUrl = process.env.AGREEMENTS_API_URL
     if (agreementsApiUrl) {
       try {
+        // Build request body - prefer agreementId if provided, otherwise use fallback method
+        const requestBody: any = {
+          backdropName: backdrop.name,
+        }
+        
+        if (agreementId) {
+          // Preferred method: use agreementId directly
+          requestBody.agreementId = agreementId
+        } else {
+          // Fallback method: use email/name/date matching
+          requestBody.clientEmail = clientEmail
+          requestBody.clientName = clientName
+          requestBody.eventDate = eventDate
+        }
+        
         const response = await fetch(`${agreementsApiUrl}/api/agreements/update-backdrop-selection`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            clientEmail,
-            clientName,
-            eventDate,
-            backdropName: backdrop.name,
-          }),
+          body: JSON.stringify(requestBody),
         })
 
         if (!response.ok) {
