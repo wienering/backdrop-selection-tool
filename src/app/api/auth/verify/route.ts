@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     const sessionToken = jwt.sign(
       { email, type: 'admin' },
       process.env.NEXTAUTH_SECRET || 'fallback-secret',
-      { expiresIn: '24h' }
+      { expiresIn: '30d' }
     )
 
     // Get the base URL for redirect
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 24 * 60 * 60, // 24 hours
+      maxAge: 30 * 24 * 60 * 60, // 30 days
       path: '/',
     })
 
